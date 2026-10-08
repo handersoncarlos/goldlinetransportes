@@ -67,8 +67,6 @@ await writeFile(`${DIST}/.htaccess`, tpl.replace('__CSP__', csp));
 
 await writeFile(`${DIST}/robots.txt`, `User-agent: *
 Allow: /
-Disallow: /obrigado.html
-Disallow: /404.html
 
 Sitemap: ${SITE_URL}/sitemap.xml
 `);
@@ -77,6 +75,7 @@ const today = new Date().toISOString().slice(0, 10);
 await writeFile(`${DIST}/sitemap.xml`, `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${SITE_URL}/</loc><lastmod>${today}</lastmod><priority>1.0</priority></url>
+  <url><loc>${SITE_URL}/trabalhe-conosco.html</loc><lastmod>${today}</lastmod><priority>0.5</priority></url>
   <url><loc>${SITE_URL}/politica-de-privacidade.html</loc><lastmod>${today}</lastmod><priority>0.3</priority></url>
 </urlset>
 `);

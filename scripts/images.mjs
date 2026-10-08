@@ -1,10 +1,11 @@
-// Gera as imagens otimizadas em public/img a partir de _referencia/02-materiais.
+// Gera as imagens otimizadas em public/img a partir de _novas-imagens/ e _referencia/02-materiais.
 // Uso: npm run images
 import sharp from 'sharp';
 import { mkdir, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const SRC = '_referencia/02-materiais';
+const NOVAS = '_novas-imagens';
 const OUT = 'public/img';
 const WIDTHS = [480, 960, 1600];
 const manifest = {};
@@ -12,24 +13,48 @@ const manifest = {};
 await mkdir(OUT, { recursive: true });
 await mkdir(`${OUT}/clientes`, { recursive: true });
 
-async function photo(name, { avif = false, quality = 72 } = {}) {
-  const src = `${SRC}/fotos/${name}.webp`;
+// Acha o arquivo novo pelo nome, aceitando .jpg, .jpeg, .png ou .webp
+async function findNova(name) {
+  const files = await readdir(NOVAS).catch(() => []);
+  const f = files.find((x) => x.replace(/\.(jpe?g|png|webp)$/i, '') === name);
+  return f ? `${NOVAS}/${f}` : null;
+}
+
+// Gera WebP nas larguras 480, 960 e 1600 (sem ampliar: acima da largura original usa a original).
+// Arquivo: <nome>-<largura real>.webp
+// smallQuality/smallAvif: qualidade menor nas larguras 480 e 960 (hero: LCP no mobile)
+async function photo(name, src, { avif = false, quality = 72, smallQuality = quality, smallAvif = 50, gray = false } = {}) {
   const meta = await sharp(src).metadata();
-  manifest[name] = { w: meta.width, h: meta.height, sizes: [] };
-  for (const w of WIDTHS) {
-    const width = Math.min(w, meta.width);
-    const height = Math.round((meta.height * width) / meta.width);
-    const img = sharp(src).resize(width);
-    await img.clone().webp({ quality, effort: 6 }).toFile(`${OUT}/${name}-${w}.webp`);
-    if (avif) await img.clone().avif({ quality: 50, effort: 6 }).toFile(`${OUT}/${name}-${w}.avif`);
-    manifest[name].sizes.push({ w, width, height });
+  const widths = [...new Set(WIDTHS.map((w) => Math.min(w, meta.width)))];
+  manifest[name] = { w: meta.width, h: meta.height, widths };
+  for (const width of widths) {
+    const small = width <= 960;
+    // PNG com canal alfa: achata sobre o grafite para não gerar transparência
+    let img = sharp(src).flatten({ background: '#1A1A1A' }).resize(width);
+    // Fotos exibidas em P&B no site: já saem em escala de cinza (mesmo visual, arquivo menor)
+    if (gray) img = img.grayscale();
+    await img.clone().webp({ quality: small ? smallQuality : quality, effort: 6 }).toFile(`${OUT}/${name}-${width}.webp`);
+    if (avif) await img.clone().avif({ quality: small ? smallAvif : 50, effort: 6 }).toFile(`${OUT}/${name}-${width}.avif`);
   }
 }
 
-// aviao-2 não é usado na página (nem na versão 1)
-for (const n of ['hero-estrada', 'frota', 'galpao', 'parceria', 'aviao', 'caminhao']) {
-  await photo(n, { avif: n === 'hero-estrada' });
+// Fotos novas (_novas-imagens). Se faltar alguma, usa a foto antiga da referência.
+const NOVAS_FOTOS = [
+  ['hero', 'hero', `${SRC}/fotos/hero-estrada.webp`, { avif: true, quality: 70, smallQuality: 50, smallAvif: 34 }],
+  ['solucoes-aereo', 'solucoes-aereo', `${SRC}/fotos/aviao.webp`],
+  ['solucoes-rodoviario', 'solucoes-rodoviario', `${SRC}/fotos/caminhao.webp`],
+  ['solucoes-farma', 'solucoes-farma', `${SRC}/fotos/galpao.webp`],
+  ['vantagens', 'vantagens', `${SRC}/fotos/frota.webp`, { gray: true }],
+  ['sobre', 'sobre', `${SRC}/fotos/galpao.webp`, { gray: true }],
+  ['premiacao-nova', 'premiacao-nova', null],
+];
+const faltando = [];
+for (const [nova, out, fallback, opts] of NOVAS_FOTOS) {
+  const src = (await findNova(nova)) || fallback;
+  if (!(await findNova(nova))) faltando.push(nova);
+  if (src) await photo(out, src, opts);
 }
+await photo('parceria', `${SRC}/fotos/parceria.webp`);
 
 // Premiações: as 4 fotos do mosaico da versão 1, largura nativa
 for (const f of ['premio-040.webp', 'premio-042.webp', 'premio-043.webp', 'premio-045.webp']) {
@@ -38,21 +63,30 @@ for (const f of ['premio-040.webp', 'premio-042.webp', 'premio-043.webp', 'premi
   manifest[f] = { w: m.width, h: m.height };
 }
 
-// Parceiros: altura 128 (2x de 64px)
-for (const f of await readdir(`${SRC}/parceiros`)) {
-  if (!f.endsWith('.png')) continue;
-  const name = f.replace('.png', '');
-  const info = await sharp(`${SRC}/parceiros/${f}`).resize({ height: 128 }).webp({ quality: 82 }).toFile(`${OUT}/${name}.webp`);
-  manifest[name] = { w: info.width, h: info.height };
+// Parceiros: logos prontos (fundo e cantos no arquivo). 1x = 64px de altura, 2x = 128px
+for (const n of ['logo-latamcargo', 'logo-gollog', 'logo-azulcargo', 'logo-mercadolivre']) {
+  const src = await findNova(n);
+  if (!src) { faltando.push(n); continue; }
+  for (const [h, suf] of [[64, ''], [128, '@2x']]) {
+    const info = await sharp(src).resize({ height: h }).webp({ quality: 92, alphaQuality: 100, smartSubsample: true }).toFile(`${OUT}/${n}${suf}.webp`);
+    if (!suf) manifest[n] = { w: info.width, h: info.height };
+  }
 }
 
-// Clientes: contidos em 240x120 (2x do bloco de exibição)
+// Clientes: recorta o fundo, aplica a mesma margem interna transparente em todos e contém em 240x112.
+// C&A: o arquivo original vem cortado na base; usamos a versão com a borda reconstruída.
 for (const f of (await readdir(`${SRC}/clientes`)).sort()) {
   if (!f.endsWith('.png')) continue;
   const name = f.replace('.png', '');
-  const info = await sharp(`${SRC}/clientes/${f}`)
-    .trim({ threshold: 4 })
-    .resize({ width: 240, height: 112, fit: 'inside', withoutEnlargement: true })
+  const src = name === 'cea' && (await findNova('cliente-cea-restaurado')) ? await findNova('cliente-cea-restaurado') : `${SRC}/clientes/${f}`;
+  const trimmed = await sharp(src).trim({ threshold: 4 }).png().toBuffer({ resolveWithObject: true });
+  const pad = Math.round(Math.max(trimmed.info.width, trimmed.info.height) * 0.04);
+  const padded = await sharp(trimmed.data)
+    .extend({ top: pad, bottom: pad, left: pad, right: pad, background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .png().toBuffer({ resolveWithObject: true });
+  const k = Math.min(240 / padded.info.width, 112 / padded.info.height, 1);
+  const info = await sharp(padded.data)
+    .resize(Math.round(padded.info.width * k), Math.round(padded.info.height * k))
     .webp({ quality: 82, alphaQuality: 90 })
     .toFile(`${OUT}/clientes/${name}.webp`);
   manifest[`clientes/${name}`] = { w: info.width, h: info.height };
@@ -113,3 +147,4 @@ await sharp(`${SRC}/fotos/hero-estrada.webp`)
 
 await writeFile(path.join('scripts', 'images-manifest.json'), JSON.stringify(manifest, null, 2));
 console.log('Imagens geradas em', OUT);
+if (faltando.length) console.warn('Imagens novas não encontradas em _novas-imagens/:', faltando.join(', '));

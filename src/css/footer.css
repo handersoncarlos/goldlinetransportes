@@ -15,3 +15,10 @@
 .footer__links a,.footer__links .linklike{display:inline-flex;align-items:center;min-height:44px;text-decoration:underline;text-underline-offset:3px}
 @media (max-width:1060px){ .footer__grid{grid-template-columns:1fr 1fr} }
 @media (max-width:560px){ .footer__grid{grid-template-columns:1fr;gap:28px} }
+
+.footer__contact a{display:inline-flex;align-items:flex-start;gap:10px;min-height:36px;padding:6px 0}
+.footer__contact svg{width:16px;height:16px;flex:none;margin-top:3px;color:var(--gold)}
+@media (max-width:560px){
+  .footer__links{gap:0 18px}
+  .footer__links > span[aria-hidden]{display:none}
+}

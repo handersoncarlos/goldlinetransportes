@@ -1,8 +1,8 @@
 import '../css/main.css';
 import { initConsent } from './consent.js';
-import { captureUtm, initClickTracking } from './tracking.js';
 import { initForm } from './form.js';
-import { initHeader, initMenu, initFaq, initClients, initLazyMaps, initVideo, initWaFloat, initYear } from './ui.js';
+import { initHeader, initMenu, initFaq, initClients, initLazyMaps, initVideo, initWaFloat, initToTop, initCopy, initYear } from './ui.js';
+import { captureUtm, initClickTracking, track } from './tracking.js';
 
 const root = document.documentElement;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -18,6 +18,8 @@ initClients(reduced);
 initLazyMaps();
 initVideo();
 initWaFloat();
+initToTop();
+initCopy(() => track('curriculo_email_click', { acao: 'copiar' }));
 initYear();
 
 // Bundle de animação (GSAP + Lenis) em chunk separado, carregado depois do conteúdo principal.

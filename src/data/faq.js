@@ -11,7 +11,7 @@ export const FAQ = [
   },
   {
     q: 'Vocês transportam medicamentos e produtos controlados?',
-    a: 'Sim. A Goldline é autorizada pela ANVISA, ANTT e IBAMA para transportar medicamentos simples e controlados, correlatos, cosméticos, saneantes, insumos farmacêuticos, químicos e produtos perigosos.',
+    a: 'Sim. A Goldline é autorizada pela ANVISA, ANTT, IBAMA e Polícia Federal para transportar medicamentos simples e controlados, correlatos, cosméticos, saneantes, insumos farmacêuticos, químicos e produtos perigosos.',
   },
   {
     q: 'Como acompanho a minha carga?',

@@ -1,16 +1,22 @@
 .award{display:grid;grid-template-columns:1fr 1.1fr;gap:56px;align-items:center}
 .award-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .award-photos img{width:100%;height:170px;object-fit:cover;border-radius:var(--radius-sm);border:3px solid var(--gold)}
-.award-photos img:nth-child(1),.award-photos img:nth-child(4){grid-column:span 2}
+.award-photos img:nth-child(2),.award-photos img:nth-child(5){grid-column:span 2}
+.award-photos .award-photos__main{grid-column:1/-1;height:auto;aspect-ratio:16/7;object-position:50% 28%}
 .trophy{display:flex;align-items:center;gap:18px;margin:22px 0 30px;padding:20px 22px;border-left:4px solid var(--gold);background:var(--gold-soft);border-radius:0 var(--radius-md) var(--radius-md) 0}
 .trophy .x4{font-size:3.4rem;color:var(--ink);font-variant-numeric:tabular-nums;flex:none}
 .trophy p{font-size:.95rem;color:var(--text);font-weight:500}
 .partners-label{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:12px}
-.partners{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-.partners img{height:64px;width:auto;border-radius:var(--radius-sm)}
+/* Logos prontos (fundo e cantos no próprio arquivo): imagem pura, mesma altura */
+/* 4 em linha quando cabem (4 x 158px + 3 x 16px); senão 2 x 2, sem cortar logo */
+.partners-wrap{container-type:inline-size}
+.partners{display:grid;grid-template-columns:repeat(2,max-content);gap:16px;align-items:center}
+@container (min-width:680px){ .partners{grid-template-columns:repeat(4,max-content)} }
+.partners img{height:64px;width:auto}
 
 @media (max-width:860px){ .award{grid-template-columns:1fr;gap:36px} }
 @media (max-width:560px){
   .award-photos img{height:120px}
   .partners img{height:52px}
+  .award-photos .award-photos__main{height:auto}
 }

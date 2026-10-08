@@ -86,29 +86,40 @@ export function initClients(reduced) {
     // imagens não são baixadas antes de a faixa chegar perto da tela
     const copy = items.map((li) => li.outerHTML.replace('<li class="client"', '<li class="client" aria-hidden="true"').replace(/alt="[^"]*"/, 'alt=""')).join('');
     row.insertAdjacentHTML('beforeend', copy);
-    // ~40s por ciclo, proporcional ao número de logos
-    row.style.setProperty('--marquee-dur', `${Math.round(items.length * 2.6)}s`);
+    // ~80s por ciclo (metade da velocidade inicial), proporcional ao número de logos
+    row.style.setProperty('--marquee-dur', `${Math.round(items.length * 5.2)}s`);
   });
   box.classList.add('is-marquee');
   new IntersectionObserver(([en]) => box.classList.toggle('is-paused', !en.isIntersecting)).observe(box);
 }
 
-// Iframes do Google Maps só quando o card se aproxima da tela
+// Google Maps (grava cookies do Google):
+// com aceite, o iframe carrega sozinho quando o card se aproxima da tela;
+// sem aceite, fica o placeholder com "Ver mapa" (carrega só aquele card) e "Abrir no Google Maps".
 export function initLazyMaps() {
-  const els = document.querySelectorAll('[data-gmap]');
+  const els = [...document.querySelectorAll('[data-gmap]')];
   if (!els.length) return;
   const load = (el) => {
+    if (el.classList.contains('is-loaded')) return;
     const f = document.createElement('iframe');
     f.src = el.dataset.gmap;
     f.title = el.dataset.title;
     f.loading = 'lazy';
     f.referrerPolicy = 'no-referrer-when-downgrade';
     el.appendChild(f);
+    el.classList.add('is-loaded');
   };
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((en) => { if (en.isIntersecting) { load(en.target); io.unobserve(en.target); } });
-  }, { rootMargin: '200px 0px' });
-  els.forEach((el) => io.observe(el));
+  let io = null;
+  const auto = () => {
+    if (io) return;
+    io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => { if (en.isIntersecting) { load(en.target); io.unobserve(en.target); } });
+    }, { rootMargin: '200px 0px' });
+    els.forEach((el) => io.observe(el));
+  };
+  els.forEach((el) => el.querySelector('[data-gmap-load]')?.addEventListener('click', () => load(el)));
+  if (window.__glConsent === 'granted') auto();
+  document.addEventListener('gl:consent', (e) => { if (e.detail === 'granted') auto(); });
 }
 
 // Vídeo do YouTube (nocookie) carregado só no clique
@@ -126,12 +137,50 @@ export function initVideo() {
   });
 }
 
-// WhatsApp flutuante some quando o botão de envio do formulário está visível
+// WhatsApp flutuante e "voltar ao topo" somem quando o botão de envio do formulário está visível
 export function initWaFloat() {
-  const fab = document.querySelector('.wa-float');
+  const fabs = document.querySelectorAll('.wa-float, .to-top');
   const submit = document.querySelector('.qform__submit');
-  if (!fab || !submit) return;
-  new IntersectionObserver(([en]) => fab.classList.toggle('is-hidden', en.isIntersecting), { rootMargin: '0px 0px 40px 0px' }).observe(submit);
+  if (!fabs.length || !submit) return;
+  new IntersectionObserver(([en]) => fabs.forEach((f) => f.classList.toggle('is-hidden', en.isIntersecting)), { rootMargin: '0px 0px 40px 0px' }).observe(submit);
+}
+
+// Voltar ao topo: aparece depois de 600px de rolagem
+export function initToTop() {
+  const btn = document.getElementById('toTop');
+  if (!btn) return;
+  let ticking = false;
+  const update = () => { ticking = false; btn.classList.toggle('is-visible', scrollY > 600); };
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  update();
+  btn.addEventListener('click', () => {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (window.__glLenis) window.__glLenis.scrollTo(0, { duration: 1.1 });
+    else window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+    document.querySelector('.header .logo')?.focus({ preventScroll: true });
+  });
+}
+
+// Botão "Copiar e-mail" ([data-copy]) com retorno "E-mail copiado"
+export function initCopy(onCopy) {
+  document.querySelectorAll('[data-copy]').forEach((btn) => {
+    const label = btn.querySelector('[data-copy-label]') || btn;
+    const original = label.textContent;
+    const status = document.getElementById(btn.getAttribute('aria-describedby') || '');
+    btn.addEventListener('click', async () => {
+      const text = btn.dataset.copy;
+      let ok = false;
+      try { await navigator.clipboard.writeText(text); ok = true; } catch {
+        // Alternativa: seleciona o texto visível para o usuário copiar
+        const el = document.getElementById(btn.dataset.copyTarget || '');
+        if (el) { const r = document.createRange(); r.selectNodeContents(el); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); ok = document.execCommand?.('copy') ?? false; }
+      }
+      label.textContent = ok ? 'E-mail copiado' : 'Selecione e copie o e-mail';
+      if (status) status.textContent = label.textContent;
+      onCopy?.(btn);
+      setTimeout(() => { label.textContent = original; }, 2500);
+    });
+  });
 }
 
 export function initYear() {

@@ -24,3 +24,31 @@
 .thanks h1{font-size:clamp(2.4rem,6vw,4.4rem);color:#fff;margin:.8rem 0 1rem}
 .thanks p{color:var(--on-dark-muted);font-size:1.08rem;margin-bottom:2rem;max-width:600px}
 .thanks__icon{width:64px;height:64px;color:var(--gold)}
+
+/* Trabalhe Conosco */
+.page-top__in{position:relative;z-index:2}
+.page-top .curve--2{right:-120px;bottom:-380px;width:600px;height:600px}
+.careers__grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:start}
+.careers .lead{color:var(--text);max-width:none}
+.careers__actions{display:flex;flex-direction:column;align-items:flex-start;gap:16px;margin:28px 0 24px}
+.careers__email{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
+.careers__address{font-weight:700;color:var(--ink);user-select:all;overflow-wrap:anywhere}
+.careers__copy{min-height:44px;padding:9px 18px;font-size:.88rem}
+.careers__note{font-size:.88rem;color:var(--muted)}
+.careers__note a{color:var(--gold-text);text-decoration:underline;text-underline-offset:3px}
+.careers__steps .card__title{color:#fff;margin-top:0}
+.howto{display:grid;gap:16px;margin-top:8px}
+.howto li{display:flex;gap:12px;align-items:flex-start;color:#E0E0E0;font-size:.95rem;overflow-wrap:anywhere}
+.howto .steps__n{margin-top:-2px}
+@media (max-width:860px){ .careers__grid{grid-template-columns:1fr;gap:32px} }
+
+/* Entrada discreta (CSS) nas páginas internas */
+@media (prefers-reduced-motion:no-preference){
+  .js .page-anim{animation:hero-in .6s var(--ease) both}
+  .js .page-top .page-anim + .page-anim{animation-delay:.1s}
+  .js .careers__text{animation-delay:.18s}
+  .js .careers__steps{animation-delay:.26s}
+  .js .howto li:nth-child(1){animation-delay:.4s}
+  .js .howto li:nth-child(2){animation-delay:.5s}
+  .js .howto li:nth-child(3){animation-delay:.6s}
+}

@@ -20,11 +20,16 @@ export function heroIntro() {
       gsap.set(title, { visibility: 'visible' });
       // Sublinhado dourado sob "todo o Brasil": um traço por linha, do primeiro ao último trecho dourado
       const paths = self.lines.map((line) => {
-        const gs = [...line.querySelectorAll('.g')];
-        if (!gs.length) return null;
+        // Mede só os caracteres visíveis (sem espaços nas pontas) dos trechos dourados desta linha
+        const nodes = [...line.querySelectorAll('.g')].flatMap((g) => [...g.childNodes].filter((t) => t.nodeType === 3 && t.data.trim()));
+        if (!nodes.length) return null;
+        const first = nodes[0], last = nodes[nodes.length - 1];
+        const range = document.createRange();
+        range.setStart(first, first.data.search(/\S/));
+        range.setEnd(last, last.data.trimEnd().length);
         const lr = line.getBoundingClientRect();
-        const a = gs[0].getBoundingClientRect();
-        const z = gs[gs.length - 1].getBoundingClientRect();
+        const a = range.getBoundingClientRect();
+        const z = a;
         line.insertAdjacentHTML('beforeend', '<svg class="hl" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><path d="M1 7 C 30 2.5, 70 2.5, 99 5.5" pathLength="1"/></svg>');
         const svg = line.lastElementChild;
         svg.style.left = `${a.left - lr.left}px`;

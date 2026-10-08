@@ -28,6 +28,7 @@ export function initConsent() {
     window.__glConsent = v;
     window.gtag?.('consent', 'update', v === 'granted' ? GRANTED : DENIED);
     if (v === 'granted') window.__glLoadGTM?.();
+    document.dispatchEvent(new CustomEvent('gl:consent', { detail: v }));
     hide();
   });
 

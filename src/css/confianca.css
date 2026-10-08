@@ -5,11 +5,14 @@
 .card__ring{position:absolute;right:-90px;top:-90px;width:260px;height:260px;overflow:visible;pointer-events:none}
 .card__ring circle{fill:none;stroke:var(--gold);stroke-opacity:.25;stroke-width:1.5px;vector-effect:non-scaling-stroke}
 
-.certs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}
-.cert{border:1px solid var(--line-dark);border-radius:var(--radius-sm);padding:18px 12px 16px;text-align:center;background:var(--ink)}
+.certs-wrap{container-type:inline-size;margin-top:24px}
+.certs{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@container (min-width:640px){ .certs{grid-template-columns:repeat(4,1fr)} }
+.cert{container-type:inline-size;border:1px solid var(--line-dark);border-radius:var(--radius-sm);padding:18px 12px 16px;text-align:center;background:var(--ink)}
 .cert__check{width:30px;height:30px;margin:0 auto 8px;overflow:visible}
 .cert__check circle,.cert__check path{fill:none;stroke:var(--gold);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.cert b{display:block;font-family:var(--font-display);font-weight:800;font-stretch:80%;font-size:1.5rem;color:#fff;letter-spacing:.03em;line-height:1.1}
+/* Título em uma linha: a fonte diminui com a largura do selo ("POLÍCIA FEDERAL") e nunca quebra no meio da palavra */
+.cert b{display:block;font-family:var(--font-display);font-weight:800;font-stretch:80%;font-size:min(1.5rem,12.5cqi);white-space:nowrap;color:#fff;letter-spacing:.03em;line-height:1.1}
 .cert small{display:block;font-size:.74rem;color:var(--on-dark-soft);line-height:1.35;margin-top:4px}
 
 .steps{position:relative;margin:22px 0 26px}
@@ -22,7 +25,4 @@
 @media (max-width:860px){ .trust-grid{grid-template-columns:1fr} }
 @media (max-width:560px){
   .card{padding:24px}
-  .certs{grid-template-columns:1fr}
-  .cert{display:grid;grid-template-columns:auto 1fr;column-gap:12px;text-align:left;align-items:center}
-  .cert__check{grid-row:span 2;margin:0}
 }

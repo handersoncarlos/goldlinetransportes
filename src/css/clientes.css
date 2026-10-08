@@ -19,3 +19,5 @@
 }
 /* padding igual ao gap: o deslocamento de -50% fecha o ciclo sem salto */
 .clients.is-marquee .clients__row{padding-right:14px}
+
+@media (min-width:1024px){ .clients-lead{max-width:none} }

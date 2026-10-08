@@ -7,6 +7,7 @@
 .mo:not(.mo-ready) .adv-img{clip-path:inset(0 100% 0 0)}
 .mo:not(.mo-ready) .seg,.mo:not(.mo-ready) .adv{opacity:0}
 .mo:not(.mo-ready) .award-photos img{clip-path:inset(0 0 100% 0)}
+.mo:not(.mo-ready) .partners li{opacity:0}
 .mo:not(.mo-ready) .cert__check circle,.mo:not(.mo-ready) .cert__check path{stroke-dasharray:1;stroke-dashoffset:1}
 .mo:not(.mo-ready) .steps__fill{transform:scaleY(0)}
 .mo:not(.mo-ready) .stat__div{transform:scaleY(0)}

@@ -1,4 +1,5 @@
-.seg-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:40px}
+.seg-grid{--cols:4;display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-top:40px}
+.seg-grid > .seg{flex:0 0 calc((100% - (var(--cols) - 1) * 16px) / var(--cols))}
 .seg{border:1px solid var(--line);border-radius:var(--radius-md);padding:26px 18px;text-align:center;background:#fff;transition:border-color var(--dur-fast)}
 .seg svg{width:34px;height:34px;color:var(--ink);margin:0 auto 12px;transition:color var(--dur) var(--ease)}
 .seg b{display:block;color:var(--ink);font-size:.95rem}
@@ -7,5 +8,5 @@
   .seg:hover{border-color:var(--gold-dark)}
   .seg:hover svg{color:var(--gold-dark)}
 }
-@media (max-width:1060px){ .seg-grid{grid-template-columns:repeat(3,1fr)} }
-@media (max-width:560px){ .seg-grid{grid-template-columns:1fr 1fr} .seg:last-child{grid-column:1/-1} }
+@media (max-width:1060px){ .seg-grid{--cols:3} }
+@media (max-width:560px){ .seg-grid{--cols:2} }

@@ -24,16 +24,20 @@ export function getUtm() {
   try { return JSON.parse(sessionStorage.getItem(STORE_KEY)) || {}; } catch { return {}; }
 }
 
-// Cliques: WhatsApp, telefone, e-mail e botões que levam ao formulário
+// Cliques: Área do Cliente, WhatsApp, telefone, e-mail e botões que levam ao formulário
 export function initClickTracking(onCta) {
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a');
     if (!a) return;
     const href = a.getAttribute('href') || '';
-    if (href.startsWith('https://wa.me/')) {
+    if (a.dataset.areaCliente) {
+      track('area_cliente_click', { origem: a.dataset.areaCliente });
+    } else if (href.startsWith('https://wa.me/')) {
       track('whatsapp_click', { origem: a.dataset.waOrigem || 'nao-identificado' });
     } else if (href.startsWith('tel:')) {
-      track('phone_click', { unidade: a.dataset.unidade || 'nao-identificada' });
+      track('phone_click', { unidade: a.dataset.unidade || 'nao-identificada', ...(a.dataset.origem && { origem: a.dataset.origem }) });
+    } else if (a.dataset.curriculo) {
+      track('curriculo_email_click', { acao: 'mailto' });
     } else if (href.startsWith('mailto:')) {
       track('email_click', { email: href.slice(7) });
     } else if (a.dataset.cta) {

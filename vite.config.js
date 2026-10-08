@@ -121,6 +121,7 @@ export default defineConfig({
         index: resolve(root, 'index.html'),
         politica: resolve(root, 'politica-de-privacidade.html'),
         obrigado: resolve(root, 'obrigado.html'),
+        trabalhe: resolve(root, 'trabalhe-conosco.html'),
       },
     },
   },

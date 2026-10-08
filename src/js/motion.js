@@ -104,6 +104,7 @@ function confianca() {
 
 // Premiações ------------------------------------------------------------------
 function premios() {
+  gsap.fromTo('.partners li', { opacity: 0, y: M.dist / 2 }, { opacity: 1, y: 0, duration: M.durShort + 0.1, ease: M.ease, stagger: M.stagger, scrollTrigger: once('.partners', 'top 90%') });
   gsap.fromTo('.award-photos img', { clipPath: 'inset(0% 0% 100% 0%)' }, {
     clipPath: 'inset(0% 0% 0% 0%)', duration: M.durLong, ease: M.easeReveal, stagger: 0.1, scrollTrigger: once('[data-mosaic]', 'top 82%'),
   });

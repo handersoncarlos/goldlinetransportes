@@ -263,16 +263,103 @@ const VALID = { nome: 'Teste Silva', empresa: 'Empresa Teste', telefone: '859999
 {
   const { ctx, page } = await newPage();
   const seen = { t: new Set(), d: new Set() };
-  for (const p of ['', 'politica-de-privacidade.html', 'obrigado.html']) {
+  for (const p of ['', 'politica-de-privacidade.html', 'obrigado.html', 'trabalhe-conosco.html']) {
     await page.goto(BASE + p);
     const info = await page.evaluate(() => ({ h1: document.querySelectorAll('h1').length, t: document.title, d: document.querySelector('meta[name="description"]')?.content || '', lang: document.documentElement.lang, can: document.querySelector('link[rel="canonical"]')?.href, dash: document.documentElement.outerHTML.includes(String.fromCharCode(8212)) }));
     check(`${p || 'index.html'}: 1 H1, lang pt-BR, canonical`, info.h1 === 1 && info.lang === 'pt-BR' && !!info.can, `h1=${info.h1}`);
-    check(`${p || 'index.html'}: title e description únicos (title ${info.t.length}c, description ${info.d.length}c)`, !seen.t.has(info.t) && !seen.d.has(info.d) && info.d.length >= 140);
+    check(`${p || 'index.html'}: title e description únicos (title ${info.t.length}c, description ${info.d.length}c)`, !seen.t.has(info.t) && !seen.d.has(info.d) && info.d.length >= 100 && info.d.length <= 160 && info.t.length <= 60);
     check(`${p || 'index.html'}: sem travessão`, !info.dash);
     seen.t.add(info.t); seen.d.add(info.d);
   }
   const r404 = await page.goto(BASE + 'nao-existe/qualquer');
   check('404 personalizada com status 404 e visual carregado', r404.status() === 404 && (await page.isVisible('img[alt="Goldline Transportes"]')) && (await page.evaluate(() => document.querySelector('img').naturalWidth > 0)));
+  await ctx.close();
+}
+
+// 9. Ajustes 01 --------------------------------------------------------------------------------------
+{
+  const { ctx, page } = await newPage({ width: 1366 });
+  await page.goto(BASE);
+  const ext = await page.$$eval('a[href^="https://goldline.brudam"], a[href*="facebook.com"], a[href*="instagram.com"]', (els) => els.map((a) => [a.getAttribute('href'), a.target, a.rel]));
+  check('Área do Cliente, Facebook e Instagram em nova aba com noopener', ext.length >= 4 && ext.every(([, t, r]) => t === '_blank' && r.includes('noopener')), JSON.stringify(ext));
+  check('Área do Cliente no menu e no card Sistema de gestão', (await page.$$('a[data-area-cliente="menu"]')).length === 1 && (await page.$$('a[data-area-cliente="sistema_gestao"]')).length === 1);
+  await page.evaluate(() => {
+    addEventListener('click', (e) => { if (e.target.closest('a[target="_blank"],a[href^="tel:"]')) e.preventDefault(); }, true);
+    const fire = (sel) => document.querySelector(sel).dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    fire('a[data-area-cliente="menu"]'); fire('a[data-area-cliente="sistema_gestao"]');
+    fire('a[data-origem="rodape_fortaleza"]'); fire('a[data-wa-origem="rodape_guarulhos"]');
+  });
+  const ev = await dl(page);
+  check('area_cliente_click com origem menu e sistema_gestao', ev.filter((e) => e.event === 'area_cliente_click').map((e) => e.origem).join() === 'menu,sistema_gestao', JSON.stringify(ev.filter((e) => e.event === 'area_cliente_click')));
+  check('phone_click e whatsapp_click do rodapé com origem', ev.some((e) => e.event === 'phone_click' && e.origem === 'rodape_fortaleza') && ev.some((e) => e.event === 'whatsapp_click' && e.origem === 'rodape_guarulhos'));
+  check('Rodapé sem e-mails nas colunas das unidades', (await page.$$('.footer__contact a[href^="mailto:"]')).length === 0);
+  check('Link Trabalhe Conosco no rodapé', (await page.$$('.footer__links a[href="trabalhe-conosco.html"]')).length === 1);
+  check('7 segmentos', (await page.$$('.seg')).length === 7);
+  check('4 selos, incluindo Polícia Federal em uma linha', await page.evaluate(() => { const b = [...document.querySelectorAll('.cert b')]; const pf = b.find((x) => x.textContent === 'POLÍCIA FEDERAL'); return b.length === 4 && pf && pf.scrollWidth <= pf.clientWidth + 1 && pf.getBoundingClientRect().height < 40; }));
+  check('Parceiros: 4 logos na ordem pedida, 64px de altura', await page.evaluate(() => { const i = [...document.querySelectorAll('.partners img')]; return i.map((x) => x.alt).join() === 'LATAM Cargo,GOLLOG,Azul Cargo Express,Mercado Livre' && i.every((x) => Math.round(x.getBoundingClientRect().height) === 64); }));
+  check('Rótulo "Parceiros"', (await page.textContent('.partners-label')).trim() === 'Parceiros');
+  // Mapas: placeholder sem aceite, "Ver mapa" carrega só aquele card
+  await page.click('[data-consent="denied"]');
+  await page.evaluate(() => document.getElementById('unidades').scrollIntoView());
+  await page.waitForTimeout(800);
+  check('Sem aceite: mapas não carregam sozinhos (placeholder)', (await page.$$('.unit__map iframe')).length === 0 && (await page.isVisible('.unit__ph')));
+  const before = await page.evaluate(() => document.querySelector('.unit__map').getBoundingClientRect().height);
+  await page.click('.unit:first-child [data-gmap-load]');
+  await page.waitForTimeout(300);
+  const after = await page.evaluate(() => document.querySelector('.unit__map').getBoundingClientRect().height);
+  check('"Ver mapa" carrega só aquele card, sem mudar a altura', (await page.$$('.unit__map iframe')).length === 1 && Math.round(before) === Math.round(after), `${before} -> ${after}`);
+  check('Mapas sem filtro de cor', await page.evaluate(() => getComputedStyle(document.querySelector('.unit__map iframe')).filter === 'none'));
+  // Logos de clientes inteiros
+  const cut = await page.evaluate(() => [...document.querySelectorAll('.client:not([aria-hidden]) img')].filter((img) => { const r = img.getBoundingClientRect(), c = img.closest('.client').getBoundingClientRect(); return r.left < c.left || r.right > c.right || r.top < c.top || r.bottom > c.bottom; }).map((i) => i.alt));
+  check('31 logos de clientes inteiros dentro do card', (await page.$$('.client:not([aria-hidden])')).length === 31 && cut.length === 0, cut.join(', '));
+  check('Frase de Clientes em uma linha (1366px)', await page.evaluate(() => { const p = document.querySelector('.clients-lead'); return p.getBoundingClientRect().height < parseFloat(getComputedStyle(p).lineHeight) * 1.5; }));
+  // Voltar ao topo
+  await page.evaluate(() => window.scrollTo(0, 300)); await page.waitForTimeout(400);
+  const hiddenAt300 = !(await page.evaluate(() => document.getElementById('toTop').classList.contains('is-visible')));
+  await page.evaluate(() => window.scrollTo(0, 2000)); await page.waitForTimeout(600);
+  check('Voltar ao topo aparece só depois de 600px', hiddenAt300 && (await page.isVisible('#toTop')));
+  const geo = await page.evaluate(() => { const a = document.getElementById('toTop').getBoundingClientRect(), w = document.querySelector('.wa-float').getBoundingClientRect(); return { gap: Math.round(w.top - a.bottom), axis: Math.round((a.left + a.right) / 2 - (w.left + w.right) / 2), size: a.width }; });
+  check('Voltar ao topo: 44px, 12px acima do WhatsApp, mesmo eixo', geo.gap === 12 && Math.abs(geo.axis) <= 1 && geo.size === 44, JSON.stringify(geo));
+  await page.click('#toTop'); await page.waitForTimeout(1600);
+  check('Clique em Voltar ao topo leva ao início', (await page.evaluate(() => scrollY)) < 5);
+  await ctx.close();
+}
+{
+  // Aceite carrega os mapas sozinhos; voltar ao topo no mobile não cobre o banner nem o envio
+  const { ctx, page } = await newPage({ width: 390 });
+  await page.goto(BASE);
+  await page.evaluate(() => window.scrollTo(0, 1500)); await page.waitForTimeout(500);
+  const ov = await page.evaluate(() => { const a = document.getElementById('toTop').getBoundingClientRect(), b = document.getElementById('cookie').getBoundingClientRect(); return !(a.bottom <= b.top || a.top >= b.bottom || a.right <= b.left || a.left >= b.right); });
+  check('Mobile: voltar ao topo não cobre o banner de cookies', !ov);
+  await page.click('[data-consent="granted"]');
+  await page.evaluate(() => document.getElementById('unidades').scrollIntoView()); await page.waitForTimeout(800);
+  await page.evaluate(() => document.querySelectorAll('.unit')[1].scrollIntoView()); await page.waitForTimeout(800);
+  check('Depois do aceite: mapas carregam ao rolar', (await page.$$('.unit__map iframe')).length === 2);
+  await page.evaluate(() => document.querySelector('.qform__submit').scrollIntoView({ block: 'center' })); await page.waitForTimeout(1200);
+  check('Mobile: voltar ao topo some sobre o botão de envio', await page.evaluate(() => getComputedStyle(document.getElementById('toTop')).visibility === 'hidden'));
+  check('Parceiros 2 x 2 no mobile, 52px', await page.evaluate(() => { const i = [...document.querySelectorAll('.partners img')]; const tops = new Set(i.map((x) => Math.round(x.getBoundingClientRect().top))); return tops.size === 2 && i.every((x) => Math.round(x.getBoundingClientRect().height) === 52); }));
+  check('Segmentos: mesma altura por linha (mobile)', await page.evaluate(() => { const rows = {}; document.querySelectorAll('.seg').forEach((s) => { const r = s.getBoundingClientRect(); (rows[Math.round(r.top)] ||= []).push(Math.round(r.height)); }); return Object.values(rows).every((h) => new Set(h).size === 1); }));
+  await ctx.close();
+}
+{
+  // Trabalhe Conosco
+  const { ctx, page } = await newPage({ width: 390 });
+  await ctx.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: BASE.replace(/\/$/, '') });
+  await page.goto(BASE + 'trabalhe-conosco.html');
+  const href = await page.getAttribute('[data-curriculo]', 'href');
+  check('Trabalhe Conosco: mailto com assunto codificado', href === 'mailto:rh@goldlinetransportes.com.br?subject=Curr%C3%ADculo%20-%20%5B%C3%81rea%5D%20-%20%5BCidade%5D', href);
+  await page.click('[data-copy]');
+  await page.waitForTimeout(200);
+  check('Copiar e-mail mostra "E-mail copiado"', (await page.textContent('[data-copy-label]')).trim() === 'E-mail copiado');
+  check('E-mail copiado para a área de transferência', (await page.evaluate(() => navigator.clipboard.readText())) === 'rh@goldlinetransportes.com.br');
+  await page.evaluate(() => { addEventListener('click', (e) => { if (e.target.closest('a[href^="mailto:"]')) e.preventDefault(); }, true); document.querySelector('[data-curriculo]').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })); });
+  const ev = (await dl(page)).filter((e) => e.event === 'curriculo_email_click').map((e) => e.acao);
+  check('curriculo_email_click no botão e na cópia', ev.includes('mailto') && ev.includes('copiar'), ev.join());
+  check('Trabalhe Conosco: indexável', !(await page.$('meta[name="robots"]')));
+  check('Sem erros de JS (Trabalhe Conosco)', page.errors.length === 0, page.errors.join(' | '));
+  const robots = await (await page.request.get(BASE + 'robots.txt')).text();
+  const sitemap = await (await page.request.get(BASE + 'sitemap.xml')).text();
+  check('robots.txt sem bloqueio do obrigado; sitemap com Trabalhe Conosco', !robots.includes('obrigado') && sitemap.includes('trabalhe-conosco.html'));
   await ctx.close();
 }
 

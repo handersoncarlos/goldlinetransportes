@@ -7,20 +7,24 @@ export const SITE_URL = 'https://goldlinetransportes.com.br';
 // TODO 13: ID do Google Tag Manager (ex.: 'GTM-XXXXXXX'). Vazio = GTM não é carregado.
 export const GTM_ID = '';
 
-// TODO 14: ID do formulário no Formspree (ex.: 'xyzabcd') e e-mail de destino configurado lá.
+// TODO 14: ID do formulário no Formspree (ex.: 'xyzabcd'). O destinatário (comercial@goldlinetransportes.com.br)
+// é definido no painel do Formspree: ver README-PUBLICACAO.md.
 // Vazio = o formulário cai no fluxo de erro e oferece o envio pelo WhatsApp.
 export const FORMSPREE_ID = '';
 
 export const WHATSAPP_COMERCIAL = '5585997010005';
 export const WHATSAPP_GUARULHOS = '5511910601099';
 
-// TODO 4: link da Área do Cliente (sistema de rastreamento). Vazio = link e botão não aparecem.
-export const AREA_CLIENTE_URL = '';
+// Área do Cliente (sistema de rastreamento). Vazio = link e botão não aparecem.
+export const AREA_CLIENTE_URL = 'https://goldline.brudam.com.br/site/';
 
-// TODO 5: link do Facebook. Vazio = ícone não aparece no rodapé.
-export const FACEBOOK_URL = '';
+// Vazio = ícone não aparece no rodapé.
+export const FACEBOOK_URL = 'https://www.facebook.com/goldlinecargasaereas';
 
-export const INSTAGRAM_URL = 'https://instagram.com/goldlinetransportes';
+export const INSTAGRAM_URL = 'https://www.instagram.com/goldlinetransportes';
+
+export const EMAIL_COMERCIAL = 'comercial@goldlinetransportes.com.br';
+export const EMAIL_RH = 'rh@goldlinetransportes.com.br';
 
 // TODO 6: ID do vídeo institucional no YouTube (ex.: 'dQw4w9WgXcQ'). Vazio = bloco de vídeo não aparece.
 export const YOUTUBE_ID = '';

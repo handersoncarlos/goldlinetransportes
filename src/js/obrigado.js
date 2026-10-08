@@ -2,12 +2,13 @@ import '../css/main.css';
 import { WHATSAPP_COMERCIAL, waLink } from './config.js';
 import { initConsent } from './consent.js';
 import { initClickTracking } from './tracking.js';
-import { initHeader, initMenu, initYear } from './ui.js';
+import { initHeader, initMenu, initToTop, initYear } from './ui.js';
 
 initConsent();
 initClickTracking();
 initHeader();
 initMenu();
+initToTop();
 initYear();
 
 // Mensagem do WhatsApp montada com o resumo do pedido (sem resumo, fica a mensagem padrão do HTML)

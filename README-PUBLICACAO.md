@@ -21,8 +21,10 @@ Tudo que o cliente ainda vai confirmar está em **`src/js/config.js`**, com come
 | `SITE_URL` | Domínio final (TODO 3) | Usado em canonical, Open Graph, JSON-LD, sitemap e robots |
 | `GTM_ID` | ID do Google Tag Manager, ex.: `GTM-ABC1234` (TODO 13) | GTM não é carregado |
 | `FORMSPREE_ID` | ID do formulário no Formspree (TODO 14) | Formulário mostra erro e oferece envio pelo WhatsApp |
-| `AREA_CLIENTE_URL` | Link do sistema de rastreamento (TODO 4) | Link do menu e botão do card "Sistema de gestão" não aparecem |
-| `FACEBOOK_URL` | Página do Facebook (TODO 5) | Ícone não aparece no rodapé |
+| `AREA_CLIENTE_URL` | Link do sistema de rastreamento (hoje `https://goldline.brudam.com.br/site/`) | Link do menu e botão do card "Sistema de gestão" não aparecem |
+| `FACEBOOK_URL` | Página do Facebook | Ícone não aparece no rodapé |
+| `INSTAGRAM_URL` | Perfil do Instagram | |
+| `EMAIL_RH` | E-mail do RH usado na página Trabalhe Conosco | |
 | `YOUTUBE_ID` | ID do vídeo institucional (TODO 6) | Bloco de vídeo não aparece na seção Sobre |
 | `RAZAO_SOCIAL`, `CNPJ` | Dados do rodapé e da política (TODO 2) | |
 | `STATS` | Números da faixa dourada (TODO 1) | |
@@ -50,8 +52,20 @@ Outros pontos de edição:
 - Perguntas do FAQ (geram o HTML e o JSON-LD `FAQPage`): `src/data/faq.js`. A 9ª pergunta (seguro de carga) já tem o lugar comentado.
 - Política de privacidade: encarregado de dados e data de atualização estão marcados como `[PENDENTE]` em `politica-de-privacidade.html` (TODO 15).
 - Registros RNTRC, AFE ANVISA e CTF IBAMA: comentários `TODO 7` em `index.html`, seção Certificações.
-- Imagens: troque os originais em `_referencia/02-materiais/` e rode `npm run images`.
+- Imagens: as fotos novas ficam em `_novas-imagens/` (hero, solucoes-aereo, solucoes-rodoviario, solucoes-farma, vantagens, sobre, premiacao-nova, logos de parceiros; aceita .jpg, .png ou .webp). Troque o arquivo mantendo o nome e rode `npm run images`.
+- Mapas do Google: com aceite de cookies carregam sozinhos; sem aceite aparecem os botões "Ver mapa" e "Abrir no Google Maps".
 - Mapa do Brasil: gerado da malha oficial do IBGE por `npm run map` (não editar `src/data/brasil.js` à mão).
+
+## 2.1 Formspree (receber as cotações por e-mail)
+
+O destinatário do e-mail é definido no painel do Formspree, não no código.
+
+1. Crie a conta em https://formspree.io usando `comercial@goldlinetransportes.com.br` (ou adicione esse endereço como e-mail vinculado em Account > Linked Emails).
+2. Abra a caixa de entrada desse e-mail e clique no link de verificação enviado pelo Formspree. Sem essa confirmação os envios não são entregues.
+3. Em Forms > New Form, crie o formulário "Cotação site" e escolha `comercial@goldlinetransportes.com.br` como destinatário.
+4. Copie o ID do formulário: é o trecho final do endpoint `https://formspree.io/f/XXXXXXXX`.
+5. Cole o ID em `FORMSPREE_ID` no `src/js/config.js`, rode `npm run build` e `npm run zip` e publique de novo.
+6. Faça um envio de teste pelo site e confira o e-mail. O assunto chega como "Pedido de cotação pelo site" (campo oculto `_subject`) e o anti-spam usa o campo `_gotcha`.
 
 ## 3. Eventos para configurar no GTM
 
@@ -60,10 +74,12 @@ O código só envia eventos para o `dataLayer`. Nenhuma tag (GA4, Meta Pixel, Go
 | Evento (`event`) | Quando dispara | Parâmetros |
 |---|---|---|
 | `lead_form_submit` | Formspree confirmou o envio do formulário (antes de ir para `obrigado.html`) | `modal`, `tipo_carga`, `origem_pagina` |
-| `whatsapp_click` | Clique em qualquer link `wa.me` | `origem` (hero, card-aereo, card-rodoviario, card-farma, unidade-fortaleza, unidade-guarulhos, flutuante, cta-final, cotacao, rodape, formulario-erro, obrigado) |
-| `phone_click` | Clique em telefone (`tel:`) | `unidade` (fortaleza, guarulhos) |
+| `whatsapp_click` | Clique em qualquer link `wa.me` | `origem` (hero, card-aereo, card-rodoviario, card-farma, unidade-fortaleza, unidade-guarulhos, flutuante, cta-final, cotacao, rodape, rodape_fortaleza, rodape_guarulhos, formulario-erro, obrigado) |
+| `phone_click` | Clique em telefone (`tel:`) | `unidade` (fortaleza, guarulhos); `origem` nos links do rodapé (rodape_fortaleza, rodape_guarulhos) |
 | `email_click` | Clique em e-mail (`mailto:`) | `email` |
 | `cta_cotacao_click` | Clique em botão que leva ao formulário | `origem` (header, hero, solucoes, card-aereo, card-rodoviario, card-farma, cta-final, rodape) |
+| `area_cliente_click` | Clique na Área do Cliente | `origem` (menu, sistema_gestao) |
+| `curriculo_email_click` | Trabalhe Conosco: clique em "Enviar currículo por e-mail" ou "Copiar e-mail" | `acao` (mailto, copiar) |
 
 Sugestão de configuração no GTM:
 
