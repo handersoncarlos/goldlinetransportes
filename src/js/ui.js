@@ -187,3 +187,20 @@ export function initYear() {
   const y = String(new Date().getFullYear());
   document.querySelectorAll('[data-year]').forEach((el) => { el.textContent = y; });
 }
+
+// Fotos grandes e longe do topo: carregam quando chegam a 400px da tela (o lazy nativo antecipa
+// demais e atrasa a primeira tela no celular). Sem JS, o <noscript> ao lado tem a imagem normal.
+export function initDeferredImages() {
+  const imgs = document.querySelectorAll('img[data-defer]');
+  if (!imgs.length) return;
+  const load = (img) => {
+    if (img.dataset.sizes) img.sizes = img.dataset.sizes;
+    if (img.dataset.srcset) img.srcset = img.dataset.srcset;
+    img.src = img.dataset.src;
+    img.removeAttribute('data-defer');
+  };
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => { if (en.isIntersecting) { load(en.target); io.unobserve(en.target); } });
+  }, { rootMargin: '400px 0px' });
+  imgs.forEach((img) => io.observe(img));
+}

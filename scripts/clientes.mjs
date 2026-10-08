@@ -16,7 +16,7 @@ const CLIENTES = [
 const li = ([file, name]) => {
   const m = manifest[`clientes/${file}`];
   if (!m) throw new Error(`Logo não encontrado: ${file}`);
-  return `<li class="client"><img src="/img/clientes/${file}.webp" width="${m.w}" height="${m.h}" alt="${name}" loading="lazy" decoding="async"></li>`;
+  return `<li class="client"><img src="/img/clientes/${file}.webp" srcset="/img/clientes/${file}.webp 1x, /img/clientes/${file}@2x.webp 2x" width="${m.w}" height="${m.h}" alt="${name}" loading="lazy" decoding="async"></li>`;
 };
 const half = Math.ceil(CLIENTES.length / 2);
 await writeFile('src/partials/clientes-1.html', CLIENTES.slice(0, half).map(li).join('\n      ') + '\n');

@@ -6,8 +6,9 @@
 .header__in{display:flex;align-items:center;justify-content:space-between;gap:20px;height:var(--header-h);transition:height .3s var(--ease)}
 .header.is-compact .header__in{height:var(--header-h-compact)}
 .logo{display:inline-flex;align-items:center;min-height:44px}
-.logo img{height:38px;width:auto;transition:height .3s var(--ease)}
-.header.is-compact .logo img{height:32px}
+.logo img{height:46px;width:auto;transition:height .3s var(--ease)}
+.header.is-compact .logo img{height:38px}
+@media (max-width:560px){ .header:not(.is-compact) .logo img{height:40px} }
 
 .nav{display:flex;align-items:center;gap:26px}
 .nav__list{display:flex;align-items:center;gap:26px}

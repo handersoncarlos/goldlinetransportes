@@ -59,3 +59,6 @@ h3{font-size:var(--fs-h3);font-weight:700;font-stretch:90%;line-height:1.1}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
 }
+
+/* Fotos com carregamento adiado: sem JS vale a cópia do <noscript> */
+html:not(.js) img[data-defer]{display:none}

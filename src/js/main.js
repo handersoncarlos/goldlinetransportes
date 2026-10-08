@@ -1,7 +1,7 @@
 import '../css/main.css';
 import { initConsent } from './consent.js';
 import { initForm } from './form.js';
-import { initHeader, initMenu, initFaq, initClients, initLazyMaps, initVideo, initWaFloat, initToTop, initCopy, initYear } from './ui.js';
+import { initHeader, initMenu, initFaq, initClients, initLazyMaps, initVideo, initWaFloat, initToTop, initCopy, initYear, initDeferredImages } from './ui.js';
 import { captureUtm, initClickTracking, track } from './tracking.js';
 
 const root = document.documentElement;
@@ -16,6 +16,7 @@ initMenu();
 initFaq();
 initClients(reduced);
 initLazyMaps();
+initDeferredImages();
 initVideo();
 initWaFloat();
 initToTop();

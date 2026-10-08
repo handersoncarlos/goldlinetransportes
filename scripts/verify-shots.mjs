@@ -57,7 +57,7 @@ for (const w of widths) {
   await page.screenshot({ path: `${OUT}/full-${w}.png`, fullPage: true });
   if (sections) {
     // Nas capturas por seção, esconde o link "Pular para o conteúdo" (o recorte do Playwright o exibe)
-    await page.addStyleTag({ content: '.skip{display:none!important}' });
+    if (!nojs) await page.addStyleTag({ content: '.skip{display:none!important}' });
     const ids = await page.$$eval('main > section, footer', (els) => els.map((e, i) => e.id || `s${i}`));
     for (const [i, id] of ids.entries()) {
       const el = page.locator('main > section, footer').nth(i);

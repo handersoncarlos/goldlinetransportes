@@ -21,3 +21,7 @@
 .clients.is-marquee .clients__row{padding-right:14px}
 
 @media (min-width:1024px){ .clients-lead{max-width:none} }
+
+/* C&A: selo preto sólido; opacidade menor em repouso para equilibrar com os vizinhos */
+.client img[alt="C&A"]{opacity:.5}
+.client:hover img[alt="C&A"]{opacity:1}

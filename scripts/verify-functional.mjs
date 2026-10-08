@@ -246,6 +246,16 @@ const VALID = { nome: 'Teste Silva', empresa: 'Empresa Teste', telefone: '859999
   await ctx.close();
 }
 
+// Hero sem sublinhado e sem selos; conteúdo inteiro na primeira tela em 390px
+{
+  const { ctx, page } = await newPage({ width: 390 });
+  await page.goto(BASE); await page.waitForTimeout(1500);
+  const h = await page.evaluate(() => ({ hl: document.querySelectorAll('.hero .hl').length, tags: document.querySelectorAll('.hero__tags').length, ctas: document.querySelector('.hero__ctas').getBoundingClientRect().bottom, vh: innerHeight }));
+  check('Hero sem sublinhado e sem selos', h.hl === 0 && h.tags === 0);
+  check('Hero inteiro na primeira tela em 390px', h.ctas <= h.vh, JSON.stringify(h));
+  await ctx.close();
+}
+
 // 7. Movimento reduzido ---------------------------------------------------------------------------
 {
   const { ctx, page } = await newPage({ reduced: true });
@@ -296,7 +306,10 @@ const VALID = { nome: 'Teste Silva', empresa: 'Empresa Teste', telefone: '859999
   check('Link Trabalhe Conosco no rodapé', (await page.$$('.footer__links a[href="trabalhe-conosco.html"]')).length === 1);
   check('7 segmentos', (await page.$$('.seg')).length === 7);
   check('4 selos, incluindo Polícia Federal em uma linha', await page.evaluate(() => { const b = [...document.querySelectorAll('.cert b')]; const pf = b.find((x) => x.textContent === 'POLÍCIA FEDERAL'); return b.length === 4 && pf && pf.scrollWidth <= pf.clientWidth + 1 && pf.getBoundingClientRect().height < 40; }));
-  check('Parceiros: 4 logos na ordem pedida, 64px de altura', await page.evaluate(() => { const i = [...document.querySelectorAll('.partners img')]; return i.map((x) => x.alt).join() === 'LATAM Cargo,GOLLOG,Azul Cargo Express,Mercado Livre' && i.every((x) => Math.round(x.getBoundingClientRect().height) === 64); }));
+  await page.evaluate(() => document.getElementById('premios').scrollIntoView());
+  await page.waitForFunction(() => [...document.querySelectorAll('.partners img')].every((i) => i.complete && i.naturalWidth > 0));
+  await page.waitForTimeout(800);
+  check('Parceiros: 4 logos na ordem, 2 x 2, até 300px, cantos de 14px, proporção original', await page.evaluate(() => { const i = [...document.querySelectorAll('.partners img')]; const tops = new Set(i.map((x) => Math.round(x.getBoundingClientRect().top))); return i.map((x) => x.alt).join() === 'LATAM Cargo,GOLLOG,Azul Cargo Express,Mercado Livre' && tops.size === 2 && i.every((x) => { const r = x.getBoundingClientRect(); return r.width <= 300 && getComputedStyle(x).borderRadius === '14px' && Math.abs(r.width / r.height - x.naturalWidth / x.naturalHeight) < 0.03; }); }));
   check('Rótulo "Parceiros"', (await page.textContent('.partners-label')).trim() === 'Parceiros');
   // Mapas: placeholder sem aceite, "Ver mapa" carrega só aquele card
   await page.click('[data-consent="denied"]');
@@ -337,7 +350,7 @@ const VALID = { nome: 'Teste Silva', empresa: 'Empresa Teste', telefone: '859999
   check('Depois do aceite: mapas carregam ao rolar', (await page.$$('.unit__map iframe')).length === 2);
   await page.evaluate(() => document.querySelector('.qform__submit').scrollIntoView({ block: 'center' })); await page.waitForTimeout(1200);
   check('Mobile: voltar ao topo some sobre o botão de envio', await page.evaluate(() => getComputedStyle(document.getElementById('toTop')).visibility === 'hidden'));
-  check('Parceiros 2 x 2 no mobile, 52px', await page.evaluate(() => { const i = [...document.querySelectorAll('.partners img')]; const tops = new Set(i.map((x) => Math.round(x.getBoundingClientRect().top))); return tops.size === 2 && i.every((x) => Math.round(x.getBoundingClientRect().height) === 52); }));
+  check('Parceiros 2 x 2 no mobile, na largura total do conteúdo', await page.evaluate(() => { const i = [...document.querySelectorAll('.partners img')]; const tops = new Set(i.map((x) => Math.round(x.getBoundingClientRect().top))); const ul = document.querySelector('.partners').getBoundingClientRect(); const col = document.querySelector('.partners').parentElement.getBoundingClientRect(); return tops.size === 2 && Math.abs(ul.width - col.width) < 2; }));
   check('Segmentos: mesma altura por linha (mobile)', await page.evaluate(() => { const rows = {}; document.querySelectorAll('.seg').forEach((s) => { const r = s.getBoundingClientRect(); (rows[Math.round(r.top)] ||= []).push(Math.round(r.height)); }); return Object.values(rows).every((h) => new Set(h).size === 1); }));
   await ctx.close();
 }

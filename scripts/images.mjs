@@ -44,8 +44,8 @@ const NOVAS_FOTOS = [
   ['solucoes-aereo', 'solucoes-aereo', `${SRC}/fotos/aviao.webp`],
   ['solucoes-rodoviario', 'solucoes-rodoviario', `${SRC}/fotos/caminhao.webp`],
   ['solucoes-farma', 'solucoes-farma', `${SRC}/fotos/galpao.webp`],
-  ['vantagens', 'vantagens', `${SRC}/fotos/frota.webp`, { gray: true }],
-  ['sobre', 'sobre', `${SRC}/fotos/galpao.webp`, { gray: true }],
+  ['vantagens', 'vantagens', `${SRC}/fotos/frota.webp`, { quality: 66, smallQuality: 50 }],
+  ['sobre', 'sobre', `${SRC}/fotos/galpao.webp`, { quality: 66, smallQuality: 50 }],
   ['premiacao-nova', 'premiacao-nova', null],
 ];
 const faltando = [];
@@ -63,41 +63,42 @@ for (const f of ['premio-040.webp', 'premio-042.webp', 'premio-043.webp', 'premi
   manifest[f] = { w: m.width, h: m.height };
 }
 
-// Parceiros: logos prontos (fundo e cantos no arquivo). 1x = 64px de altura, 2x = 128px
+// Parceiros: logos prontos (fundo e cantos no arquivo)
 for (const n of ['logo-latamcargo', 'logo-gollog', 'logo-azulcargo', 'logo-mercadolivre']) {
   const src = await findNova(n);
   if (!src) { faltando.push(n); continue; }
-  for (const [h, suf] of [[64, ''], [128, '@2x']]) {
-    const info = await sharp(src).resize({ height: h }).webp({ quality: 92, alphaQuality: 100, smartSubsample: true }).toFile(`${OUT}/${n}${suf}.webp`);
-    if (!suf) manifest[n] = { w: info.width, h: info.height };
+  // Exibidos com até 300px de largura: 300 (1x) e 600 (2x)
+  for (const w of [300, 600]) {
+    const info = await sharp(src).resize({ width: w }).webp({ quality: 92, alphaQuality: 100, smartSubsample: true }).toFile(`${OUT}/${n}-${w}.webp`);
+    if (w === 300) manifest[n] = { w: info.width, h: info.height };
   }
 }
 
-// Clientes: recorta o fundo, aplica a mesma margem interna transparente em todos e contém em 240x112.
-// C&A: o arquivo original vem cortado na base; usamos a versão com a borda reconstruída.
-for (const f of (await readdir(`${SRC}/clientes`)).sort()) {
-  if (!f.endsWith('.png')) continue;
+// Clientes: recorta o fundo, aplica a mesma margem interna transparente em todos e contém em 240x112 (2x) e 120x56 (1x).
+const clientesFiles = (await readdir(`${SRC}/clientes`)).filter((f) => f.endsWith('.png'));
+if (!clientesFiles.includes('cea.png') && (await findNova('cliente-cea'))) clientesFiles.push('cea.png');
+for (const f of clientesFiles.sort()) {
   const name = f.replace('.png', '');
-  const src = name === 'cea' && (await findNova('cliente-cea-restaurado')) ? await findNova('cliente-cea-restaurado') : `${SRC}/clientes/${f}`;
+  // C&A: arquivo novo em _novas-imagens/cliente-cea.png (o antigo vinha cortado na base)
+  const src = name === 'cea' && (await findNova('cliente-cea')) ? await findNova('cliente-cea') : `${SRC}/clientes/${f}`;
   const trimmed = await sharp(src).trim({ threshold: 4 }).png().toBuffer({ resolveWithObject: true });
   const pad = Math.round(Math.max(trimmed.info.width, trimmed.info.height) * 0.04);
   const padded = await sharp(trimmed.data)
     .extend({ top: pad, bottom: pad, left: pad, right: pad, background: { r: 0, g: 0, b: 0, alpha: 0 } })
     .png().toBuffer({ resolveWithObject: true });
   const k = Math.min(240 / padded.info.width, 112 / padded.info.height, 1);
-  const info = await sharp(padded.data)
-    .resize(Math.round(padded.info.width * k), Math.round(padded.info.height * k))
-    .webp({ quality: 82, alphaQuality: 90 })
-    .toFile(`${OUT}/clientes/${name}.webp`);
+  const W2 = Math.round(padded.info.width * k), H2 = Math.round(padded.info.height * k);
+  await sharp(padded.data).resize(W2, H2).webp({ quality: 82, alphaQuality: 90 }).toFile(`${OUT}/clientes/${name}@2x.webp`);
+  const info = await sharp(padded.data).resize(Math.round(W2 / 2), Math.round(H2 / 2)).webp({ quality: 82, alphaQuality: 90 }).toFile(`${OUT}/clientes/${name}.webp`);
   manifest[`clientes/${name}`] = { w: info.width, h: info.height };
 }
 
-// Logos (header 38px, rodapé 40px; geramos 2x)
-for (const [src, out] of [
-  ['logo-goldline-fundo-escuro', 'logo-goldline'],
-  ['logo-rodape-goldline-branco', 'logo-goldline-branco'],
+// Logos em 2x (header 46px -> 92px; rodapé 40px -> 80px)
+for (const [src, out, h] of [
+  ['logo-goldline-fundo-escuro', 'logo-goldline', 92],
+  ['logo-rodape-goldline-branco', 'logo-goldline-branco', 80],
 ]) {
-  const info = await sharp(`${SRC}/logos/${src}.png`).resize({ height: 80 }).webp({ quality: 90, alphaQuality: 100 }).toFile(`${OUT}/${out}.webp`);
+  const info = await sharp(`${SRC}/logos/${src}.png`).resize({ height: h }).webp({ quality: 90, alphaQuality: 100 }).toFile(`${OUT}/${out}.webp`);
   manifest[out] = { w: info.width, h: info.height };
 }
 

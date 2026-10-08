@@ -18,32 +18,13 @@ export function heroIntro() {
     autoSplit: true,
     onSplit(self) {
       gsap.set(title, { visibility: 'visible' });
-      // Sublinhado dourado sob "todo o Brasil": um traço por linha, do primeiro ao último trecho dourado
-      const paths = self.lines.map((line) => {
-        // Mede só os caracteres visíveis (sem espaços nas pontas) dos trechos dourados desta linha
-        const nodes = [...line.querySelectorAll('.g')].flatMap((g) => [...g.childNodes].filter((t) => t.nodeType === 3 && t.data.trim()));
-        if (!nodes.length) return null;
-        const first = nodes[0], last = nodes[nodes.length - 1];
-        const range = document.createRange();
-        range.setStart(first, first.data.search(/\S/));
-        range.setEnd(last, last.data.trimEnd().length);
-        const lr = line.getBoundingClientRect();
-        const a = range.getBoundingClientRect();
-        const z = a;
-        line.insertAdjacentHTML('beforeend', '<svg class="hl" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><path d="M1 7 C 30 2.5, 70 2.5, 99 5.5" pathLength="1"/></svg>');
-        const svg = line.lastElementChild;
-        svg.style.left = `${a.left - lr.left}px`;
-        svg.style.width = `${z.right - a.left}px`;
-        return svg.querySelector('path');
-      }).filter(Boolean);
       return gsap.timeline()
         .from(self.lines, { yPercent: 110, duration: 0.62, stagger: M.staggerTight, ease: M.easeReveal })
-        .fromTo(title, { fontStretch: '62%' }, { fontStretch: '72%', duration: 0.8, ease: M.ease }, 0)
-        .fromTo(paths, { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.45, ease: 'power2.inOut' }, 0.75);
+        .fromTo(title, { fontStretch: '62%' }, { fontStretch: '72%', duration: 0.8, ease: M.ease }, 0);
     },
   });
 
-  // Eyebrow, subtítulo, CTAs e selos entram por CSS (hero.css) desde o primeiro paint: não dependem deste JS
+  // Eyebrow, subtítulo e CTAs entram por CSS (hero.css) desde o primeiro paint: não dependem deste JS
   gsap.fromTo('.hero .curve circle', { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.2, ease: 'power2.inOut', stagger: 0.12, delay: 0.1 });
 
   root.classList.add('intro-ready');

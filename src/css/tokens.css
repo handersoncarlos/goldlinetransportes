@@ -2,7 +2,7 @@
   /* Cores da marca (versão 1) */
   --gold:#E5BE55;
   --gold-hover:#F0CD6C;
-  --gold-dark:#C9A23F;
+  --gold-dark:#A7770E;  /* dourado escuro em fundo claro (decisão do cliente) */
   --gold-soft:#F7EFD9;
   --ink:#1A1A1A;
   --ink-2:#232323;
@@ -13,9 +13,9 @@
   --bg:#FFFFFF;
   --bg-alt:#F6F4EF;
 
-  /* Dourado para texto em fundo claro (AA): --gold-dark sobre branco dá 2,4:1 */
-  --gold-title:#9A7A24;   /* títulos grandes: 4,05:1 no branco, 3,7:1 no --bg-alt */
-  --gold-text:#876818;    /* texto pequeno: 5,2:1 no branco, 4,75:1 no --bg-alt */
+  /* Dourado em fundo claro: #A7770E por decisão do cliente, aceitando contraste abaixo de 4,5:1 em texto pequeno */
+  --gold-title:#A7770E;   /* palavras em destaque dos títulos */
+  --gold-text:#A7770E;    /* eyebrows, links e textos pequenos */
 
   /* Fundo escuro */
   --on-dark:#E9E9E9;

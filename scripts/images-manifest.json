@@ -85,148 +85,148 @@
     "h": 384
   },
   "logo-latamcargo": {
-    "w": 158,
-    "h": 64
+    "w": 300,
+    "h": 122
   },
   "logo-gollog": {
-    "w": 158,
-    "h": 64
+    "w": 300,
+    "h": 122
   },
   "logo-azulcargo": {
-    "w": 158,
-    "h": 64
+    "w": 300,
+    "h": 122
   },
   "logo-mercadolivre": {
-    "w": 158,
-    "h": 64
+    "w": 300,
+    "h": 122
   },
   "clientes/aramis": {
-    "w": 190,
-    "h": 40
+    "w": 95,
+    "h": 20
   },
   "clientes/avenida": {
-    "w": 174,
-    "h": 45
+    "w": 87,
+    "h": 23
   },
   "clientes/brooksfield": {
-    "w": 221,
-    "h": 112
+    "w": 111,
+    "h": 56
   },
   "clientes/cabana-del-primo": {
-    "w": 126,
-    "h": 105
-  },
-  "clientes/case": {
-    "w": 240,
-    "h": 90
-  },
-  "clientes/cea": {
-    "w": 143,
-    "h": 112
-  },
-  "clientes/coco-bambu": {
-    "w": 183,
-    "h": 112
-  },
-  "clientes/dudalina": {
-    "w": 183,
-    "h": 109
-  },
-  "clientes/eskala": {
-    "w": 168,
+    "w": 63,
     "h": 53
   },
+  "clientes/case": {
+    "w": 120,
+    "h": 45
+  },
+  "clientes/cea": {
+    "w": 72,
+    "h": 56
+  },
+  "clientes/coco-bambu": {
+    "w": 92,
+    "h": 56
+  },
+  "clientes/dudalina": {
+    "w": 92,
+    "h": 55
+  },
+  "clientes/eskala": {
+    "w": 84,
+    "h": 27
+  },
   "clientes/globo": {
-    "w": 115,
-    "h": 112
+    "w": 58,
+    "h": 56
   },
   "clientes/grazziotin": {
-    "w": 162,
-    "h": 66
+    "w": 81,
+    "h": 33
   },
   "clientes/hapvida": {
-    "w": 181,
-    "h": 112
+    "w": 91,
+    "h": 56
   },
   "clientes/harrys": {
-    "w": 130,
-    "h": 103
+    "w": 65,
+    "h": 52
   },
   "clientes/hering": {
-    "w": 240,
-    "h": 47
+    "w": 120,
+    "h": 24
   },
   "clientes/loungerie": {
-    "w": 204,
-    "h": 64
+    "w": 102,
+    "h": 32
   },
   "clientes/luzeiros": {
-    "w": 101,
-    "h": 112
+    "w": 51,
+    "h": 56
   },
   "clientes/malwee": {
-    "w": 240,
-    "h": 51
+    "w": 120,
+    "h": 26
   },
   "clientes/marisa": {
-    "w": 240,
-    "h": 65
+    "w": 120,
+    "h": 33
   },
   "clientes/pernambucanas": {
-    "w": 240,
-    "h": 86
+    "w": 120,
+    "h": 43
   },
   "clientes/renner": {
-    "w": 240,
-    "h": 59
+    "w": 120,
+    "h": 30
   },
   "clientes/riachuelo": {
-    "w": 240,
-    "h": 93
-  },
-  "clientes/sergio-k": {
-    "w": 227,
+    "w": 120,
     "h": 47
   },
+  "clientes/sergio-k": {
+    "w": 114,
+    "h": 24
+  },
   "clientes/taco": {
-    "w": 206,
-    "h": 86
+    "w": 103,
+    "h": 43
   },
   "clientes/telefonica": {
-    "w": 240,
-    "h": 80
+    "w": 120,
+    "h": 40
   },
   "clientes/tng": {
-    "w": 118,
-    "h": 94
+    "w": 59,
+    "h": 47
   },
   "clientes/torra": {
-    "w": 152,
-    "h": 78
+    "w": 76,
+    "h": 39
   },
   "clientes/toyota": {
-    "w": 191,
-    "h": 44
+    "w": 96,
+    "h": 22
   },
   "clientes/unimed": {
-    "w": 154,
-    "h": 112
+    "w": 77,
+    "h": 56
   },
   "clientes/via-veneto": {
-    "w": 154,
-    "h": 88
+    "w": 77,
+    "h": 44
   },
   "clientes/vivo": {
-    "w": 240,
-    "h": 87
+    "w": 120,
+    "h": 44
   },
   "clientes/zinzane": {
-    "w": 151,
-    "h": 92
+    "w": 76,
+    "h": 46
   },
   "logo-goldline": {
-    "w": 331,
-    "h": 80
+    "w": 381,
+    "h": 92
   },
   "logo-goldline-branco": {
     "w": 331,

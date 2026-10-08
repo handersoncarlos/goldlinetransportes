@@ -1,4 +1,4 @@
-.hero{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:calc(var(--header-h) + 48px) 0 80px;color:#fff;overflow:hidden;background:var(--ink)}
+.hero{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:calc(var(--header-h) + 40px) 0 40px;color:#fff;overflow:hidden;background:var(--ink)}
 .hero__media{position:absolute;inset:0;overflow:hidden}
 .hero__img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;transform-origin:50% 0}
 .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(18,18,18,.94) 0%,rgba(18,18,18,.78) 45%,rgba(18,18,18,.35) 100%);pointer-events:none}
@@ -14,16 +14,10 @@
 
 .hero__title{max-width:820px;margin:.9rem 0 1.2rem;color:#fff}
 .hero__title .g{color:var(--gold)}
-.hero__line{position:relative}
-.hero__title .hl{position:absolute;bottom:0;height:.12em;overflow:visible;pointer-events:none}
-.hero__title .hl path{fill:none;stroke:var(--gold);stroke-width:3;stroke-linecap:round;vector-effect:non-scaling-stroke}
 .hero__sub{font-size:clamp(1.02rem,1.6vw,1.2rem);color:#D2D2D2;max-width:600px;margin-bottom:2rem}
-.hero__tags{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:2.6rem;color:#CFCFCF;font-size:.88rem;font-weight:600}
-.hero__tags li{display:inline-flex;align-items:center;gap:8px}
-.hero__tags svg{width:18px;height:18px;color:var(--gold)}
 
 @media (max-width:560px){
-  .hero{padding-top:calc(var(--header-h) + 36px);padding-bottom:64px}
+  .hero{padding-top:calc(var(--header-h) + 28px);padding-bottom:28px}
   .hero__ctas .btn{width:100%}
   .curve--1{width:420px;height:420px;right:-180px;bottom:-120px}
   .curve--2{width:500px;height:500px;right:-160px;bottom:-190px}
@@ -31,13 +25,10 @@
 
 /* Entrada em stagger por CSS (não espera o JS: o subtítulo é o elemento LCP no mobile) */
 @media (prefers-reduced-motion:no-preference){
-  .js .hero__eyebrow,.js .hero__ctas,.js .hero__tags li{animation:hero-in .6s var(--ease) both}
+  .js .hero__eyebrow,.js .hero__ctas{animation:hero-in .6s var(--ease) both}
   /* Subtítulo (elemento LCP no mobile): só desliza, legível desde o primeiro frame */
   .js .hero__sub{animation:hero-slide .6s var(--ease) both}
   .js .hero__ctas{animation-delay:.18s}
-  .js .hero__tags li:nth-child(1){animation-delay:.28s}
-  .js .hero__tags li:nth-child(2){animation-delay:.34s}
-  .js .hero__tags li:nth-child(3){animation-delay:.4s}
 }
 @keyframes hero-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes hero-slide{from{transform:translateY(14px)}to{transform:none}}

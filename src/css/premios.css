@@ -7,16 +7,13 @@
 .trophy .x4{font-size:3.4rem;color:var(--ink);font-variant-numeric:tabular-nums;flex:none}
 .trophy p{font-size:.95rem;color:var(--text);font-weight:500}
 .partners-label{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:12px}
-/* Logos prontos (fundo e cantos no próprio arquivo): imagem pura, mesma altura */
-/* 4 em linha quando cabem (4 x 158px + 3 x 16px); senão 2 x 2, sem cortar logo */
-.partners-wrap{container-type:inline-size}
-.partners{display:grid;grid-template-columns:repeat(2,max-content);gap:16px;align-items:center}
-@container (min-width:680px){ .partners{grid-template-columns:repeat(4,max-content)} }
-.partners img{height:64px;width:auto}
+/* Parceiros: 2 x 2, cada logo na largura da sua coluna (máx. 300px), proporção original e cantos de 14px */
+.partners{display:grid;grid-template-columns:repeat(2,minmax(0,300px));gap:16px;align-items:center}
+.partners img{display:block;width:100%;height:auto;border-radius:var(--radius)}
 
 @media (max-width:860px){ .award{grid-template-columns:1fr;gap:36px} }
 @media (max-width:560px){
   .award-photos img{height:120px}
-  .partners img{height:52px}
+  .partners{grid-template-columns:repeat(2,minmax(0,1fr))}
   .award-photos .award-photos__main{height:auto}
 }
