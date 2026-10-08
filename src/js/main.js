@@ -23,7 +23,10 @@ initYear();
 // Bundle de animação (GSAP + Lenis) em chunk separado, carregado depois do conteúdo principal.
 // Com movimento reduzido ele nem é baixado.
 if (root.classList.contains('mo') && document.querySelector('.hero')) {
-  import('./motion.js')
+  // Entrada do hero (chunk pequeno, com modulepreload no HTML) e depois o restante
+  import('./intro.js')
+    .then((m) => m.heroIntro())
+    .then(() => import('./motion.js'))
     .then((m) => m.initMotion())
     .catch(() => root.classList.remove('mo'));
 } else {

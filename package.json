@@ -4,11 +4,14 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "images": "node scripts/images.mjs && node scripts/clientes.mjs",
     "dev": "vite",
     "build": "vite build && node scripts/postbuild.mjs",
     "preview": "node scripts/serve.mjs",
-    "map": "node scripts/map.mjs"
+    "zip": "rm -f goldline-v2-hostinger.zip && cd dist && zip -r -X -q ../goldline-v2-hostinger.zip . -x \"*.DS_Store\"",
+    "images": "node scripts/images.mjs && node scripts/clientes.mjs",
+    "map": "node scripts/map.mjs",
+    "verify:shots": "node scripts/verify-shots.mjs",
+    "verify:func": "node scripts/verify-functional.mjs"
   },
   "dependencies": {
     "@fontsource/montserrat": "^5.3.0",

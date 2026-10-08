@@ -28,3 +28,16 @@
   .curve--1{width:420px;height:420px;right:-180px;bottom:-120px}
   .curve--2{width:500px;height:500px;right:-160px;bottom:-190px}
 }
+
+/* Entrada em stagger por CSS (não espera o JS: o subtítulo é o elemento LCP no mobile) */
+@media (prefers-reduced-motion:no-preference){
+  .js .hero__eyebrow,.js .hero__ctas,.js .hero__tags li{animation:hero-in .6s var(--ease) both}
+  /* Subtítulo (elemento LCP no mobile): só desliza, legível desde o primeiro frame */
+  .js .hero__sub{animation:hero-slide .6s var(--ease) both}
+  .js .hero__ctas{animation-delay:.18s}
+  .js .hero__tags li:nth-child(1){animation-delay:.28s}
+  .js .hero__tags li:nth-child(2){animation-delay:.34s}
+  .js .hero__tags li:nth-child(3){animation-delay:.4s}
+}
+@keyframes hero-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes hero-slide{from{transform:translateY(14px)}to{transform:none}}

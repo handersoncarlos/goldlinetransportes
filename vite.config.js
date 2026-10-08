@@ -50,10 +50,9 @@ function renderMap() {
   return `<div class="map" data-map>
         <svg class="map__svg" viewBox="${VIEWBOX}" role="img" aria-labelledby="map-title">
           <title id="map-title">Mapa do Brasil com a rota entre a matriz em Fortaleza/CE e a filial em Guarulhos/SP</title>
-          <defs><mask id="route-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="${vw}" height="${vh}"><path class="map__route-mask" d="${route}" pathLength="1"/></mask></defs>
           <path class="map__land" d="${BRASIL_PATH}" pathLength="1"/>
           <path class="map__route" id="map-route" d="${route}"/>
-          <path class="map__route-dash" d="${route}" mask="url(#route-mask)"/>
+          <path class="map__route-dash" d="${route}"/>
           <g class="map__pt map__pt--for"><circle class="map__halo" cx="${f.x}" cy="${f.y}" r="9"/><circle class="map__dot" cx="${f.x}" cy="${f.y}" r="4.5"/></g>
           <g class="map__pt map__pt--gru"><circle class="map__pulse" cx="${g.x}" cy="${g.y}" r="4.5"/><circle class="map__halo" cx="${g.x}" cy="${g.y}" r="9"/><circle class="map__dot" cx="${g.x}" cy="${g.y}" r="4.5"/></g>
           <g class="map__plane" aria-hidden="true"><path transform="scale(.62) translate(-12 -12)" d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></g>
@@ -112,6 +111,12 @@ export default defineConfig({
     target: 'es2020',
     assetsInlineLimit: 0,
     rollupOptions: {
+      output: {
+        // Núcleo do GSAP num chunk próprio, compartilhado pela entrada do hero e pelo motion.js
+        manualChunks(id) {
+          if (/node_modules\/gsap\/(index|gsap-core|CSSPlugin)\.js/.test(id)) return 'gsap-core';
+        },
+      },
       input: {
         index: resolve(root, 'index.html'),
         politica: resolve(root, 'politica-de-privacidade.html'),

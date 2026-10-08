@@ -21,6 +21,8 @@
 .sol__wa{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);color:var(--ink);transition:border-color var(--dur-fast),color var(--dur-fast),background-color var(--dur-fast)}
 .sol__wa svg{width:20px;height:20px}
 
+/* TODO 12: quando chegarem as fotos coloridas originais, o hover passa de P&B para cor:
+   trocar o véu dourado por  .sol:hover .sol__ph img{filter:none}  */
 @media (hover:hover) and (pointer:fine){
   .sol:hover{transform:translateY(-4px);box-shadow:var(--shadow-card)}
   .sol:hover .sol__ph img{transform:scale(1.04)}

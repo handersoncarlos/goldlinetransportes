@@ -82,12 +82,10 @@ export function initClients(reduced) {
   if (!box || reduced) return;
   box.querySelectorAll('.clients__row').forEach((row) => {
     const items = [...row.children];
-    items.forEach((li) => {
-      const c = li.cloneNode(true);
-      c.setAttribute('aria-hidden', 'true');
-      c.querySelector('img').alt = '';
-      row.appendChild(c);
-    });
+    // Clones via HTML (e não cloneNode): assim o loading="lazy" vale desde a criação e as
+    // imagens não são baixadas antes de a faixa chegar perto da tela
+    const copy = items.map((li) => li.outerHTML.replace('<li class="client"', '<li class="client" aria-hidden="true"').replace(/alt="[^"]*"/, 'alt=""')).join('');
+    row.insertAdjacentHTML('beforeend', copy);
     // ~40s por ciclo, proporcional ao número de logos
     row.style.setProperty('--marquee-dur', `${Math.round(items.length * 2.6)}s`);
   });

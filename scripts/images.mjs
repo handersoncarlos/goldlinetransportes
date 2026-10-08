@@ -26,13 +26,13 @@ async function photo(name, { avif = false, quality = 72 } = {}) {
   }
 }
 
-for (const n of ['hero-estrada', 'frota', 'galpao', 'parceria', 'aviao', 'aviao-2', 'caminhao']) {
+// aviao-2 não é usado na página (nem na versão 1)
+for (const n of ['hero-estrada', 'frota', 'galpao', 'parceria', 'aviao', 'caminhao']) {
   await photo(n, { avif: n === 'hero-estrada' });
 }
 
-// Premiações: largura nativa pequena, 1 versão
-for (const f of await readdir(`${SRC}/premios`)) {
-  if (!f.endsWith('.webp')) continue;
+// Premiações: as 4 fotos do mosaico da versão 1, largura nativa
+for (const f of ['premio-040.webp', 'premio-042.webp', 'premio-043.webp', 'premio-045.webp']) {
   const m = await sharp(`${SRC}/premios/${f}`).metadata();
   await sharp(`${SRC}/premios/${f}`).webp({ quality: 74 }).toFile(`${OUT}/${f}`);
   manifest[f] = { w: m.width, h: m.height };
@@ -63,7 +63,7 @@ for (const [src, out] of [
   ['logo-goldline-fundo-escuro', 'logo-goldline'],
   ['logo-rodape-goldline-branco', 'logo-goldline-branco'],
 ]) {
-  const info = await sharp(`${SRC}/logos/${src}.png`).resize({ height: 84 }).webp({ quality: 90, alphaQuality: 100 }).toFile(`${OUT}/${out}.webp`);
+  const info = await sharp(`${SRC}/logos/${src}.png`).resize({ height: 80 }).webp({ quality: 90, alphaQuality: 100 }).toFile(`${OUT}/${out}.webp`);
   manifest[out] = { w: info.width, h: info.height };
 }
 

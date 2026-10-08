@@ -1,26 +1,13 @@
 // Animações (carregado em chunk separado depois do conteúdo principal).
-// Regras: só transform, opacity, clip-path (e o eixo wdth da fonte nos títulos "4x" e H1);
+// Regras: só transform, opacity, clip-path (e o eixo wdth da fonte no "4x"); o hero fica em intro.js;
 // entradas rodam uma vez; com prefers-reduced-motion este arquivo nem é baixado.
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SplitText } from 'gsap/SplitText';
 import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
 import Lenis from 'lenis';
+import { M } from './motion-tokens.js';
 
-gsap.registerPlugin(ScrollTrigger, SplitText, MotionPathPlugin);
-
-// Tokens de movimento
-const isSmall = matchMedia('(max-width: 767px)').matches;
-export const M = {
-  dur: 0.7,        // padrão
-  durShort: 0.4,
-  durLong: 0.9,
-  ease: 'power3.out',
-  easeReveal: 'expo.out',
-  stagger: 0.08,
-  staggerTight: 0.06,
-  dist: isSmall ? 20 : 32,
-};
+gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
 
 const $ = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => [...c.querySelectorAll(s)];
@@ -36,7 +23,7 @@ function initLenis() {
   gsap.ticker.add((t) => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
 
-  // Âncoras internas com offset do header
+  // Âncoras internas (offset do header vem do scroll-padding-top)
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[href^="#"]');
     if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey) return;
@@ -44,10 +31,8 @@ function initLenis() {
     const target = id.length > 1 ? document.getElementById(id.slice(1)) : null;
     if (!target) return;
     e.preventDefault();
-    const header = $('#header');
-    const offset = target.id === 'topo' ? 0 : -((header?.offsetHeight || 60) + 8);
+    // O Lenis já desconta o scroll-padding-top do <html> (altura do header): sem offset extra
     lenis.scrollTo(target, {
-      offset,
       duration: 1.1,
       onComplete: () => {
         if (!target.hasAttribute('tabindex') && !target.matches('a,button,input,select,textarea')) target.setAttribute('tabindex', '-1');
@@ -56,46 +41,6 @@ function initLenis() {
     });
     history.replaceState(null, '', id);
   });
-}
-
-// Hero ------------------------------------------------------------------------
-function hero() {
-  const title = $('.hero__title');
-  if (!title) return;
-
-  SplitText.create(title, {
-    type: 'lines',
-    mask: 'lines',
-    linesClass: 'hero__line',
-    autoSplit: true,
-    onSplit(self) {
-      gsap.set(title, { visibility: 'visible' });
-      // Sublinhado dourado sob "todo o Brasil": um traço por linha, do primeiro ao último trecho dourado
-      const paths = self.lines.map((line) => {
-        const gs = $$('.g', line);
-        if (!gs.length) return null;
-        const lr = line.getBoundingClientRect();
-        const a = gs[0].getBoundingClientRect();
-        const z = gs[gs.length - 1].getBoundingClientRect();
-        line.insertAdjacentHTML('beforeend', '<svg class="hl" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><path d="M1 7 C 30 2.5, 70 2.5, 99 5.5" pathLength="1"/></svg>');
-        const svg = line.lastElementChild;
-        svg.style.left = `${a.left - lr.left}px`;
-        svg.style.width = `${z.right - a.left}px`;
-        return svg.querySelector('path');
-      }).filter(Boolean);
-      return gsap.timeline()
-        .from(self.lines, { yPercent: 110, duration: 0.62, stagger: M.staggerTight, ease: M.easeReveal })
-        .fromTo(title, { fontStretch: '62%' }, { fontStretch: '72%', duration: 0.8, ease: M.ease }, 0)
-        .fromTo(paths, { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.45, ease: 'power2.inOut' }, 0.75);
-    },
-  });
-
-  gsap.timeline({ defaults: { ease: M.ease, duration: M.durShort + 0.1 } })
-    .fromTo('.hero__eyebrow', { opacity: 0, y: M.dist / 2 }, { opacity: 1, y: 0 }, 0)
-    .fromTo('.hero__sub', { opacity: 0, y: M.dist / 2 }, { opacity: 1, y: 0 }, 0.3)
-    .fromTo('.hero__ctas', { opacity: 0, y: M.dist / 2 }, { opacity: 1, y: 0 }, 0.4)
-    .fromTo('.hero__tags li', { opacity: 0, y: M.dist / 2 }, { opacity: 1, y: 0, stagger: M.staggerTight }, 0.5)
-    .fromTo('.hero .curve circle', { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.2, ease: 'power2.inOut', stagger: 0.12 }, 0.1);
 }
 
 // Números ---------------------------------------------------------------------
@@ -169,18 +114,32 @@ function mapa() {
   const map = $('[data-map]');
   if (!map) return;
   const plane = $('.map__plane', map);
-  gsap.set('.map__pulse', { opacity: 0, scale: 1 });
+  const dash = $('.map__route-dash', map);
+  // Tracejado que "se desenha": o dasharray cresce com o progresso (mesma base de comprimento do avião)
+  const L = dash.getTotalLength();
+  const D = 5, G = 5;
+  const route = { p: 0 };
+  const drawDash = () => {
+    const len = route.p * L;
+    const n = Math.floor(len / (D + G));
+    const arr = [];
+    for (let i = 0; i < n; i++) arr.push(D, G);
+    arr.push(Math.min(len - n * (D + G), D), L);
+    dash.style.strokeDasharray = arr.join(' ');
+  };
+  drawDash();
+  gsap.set('.map__pulse', { opacity: 0, scale: 1, transformOrigin: '50% 50%' });
   gsap.timeline({ scrollTrigger: once(map, 'top 75%'), defaults: { ease: M.ease } })
     .fromTo('.map__land', { strokeDasharray: 1, strokeDashoffset: 1, fillOpacity: 0 }, { strokeDashoffset: 0, duration: 1, ease: 'power2.inOut' })
     .to('.map__land', { fillOpacity: 1, duration: 0.5 }, 0.5)
     .fromTo('.map__pt--for', { opacity: 0, scale: 0.4, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: 0.35 }, 0.75)
-    .set('.map__route-dash', { opacity: 1 }, 1)
-    .fromTo('.map__route-mask', { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.2, ease: 'power1.inOut' }, 1)
+    .set(dash, { opacity: 1 }, 1)
+    .to(route, { p: 1, duration: 1.2, ease: 'power1.inOut', onUpdate: drawDash, onComplete: () => { dash.style.strokeDasharray = ''; } }, 1)
     .set(plane, { opacity: 1 }, 1)
     .to(plane, {
       duration: 1.2,
       ease: 'power1.inOut',
-      motionPath: { path: '#map-route', autoRotate: 45 },
+      motionPath: { path: '#map-route', align: '#map-route', alignOrigin: [0.5, 0.5], autoRotate: 45 },
     }, 1)
     .to(plane, { opacity: 0, duration: 0.2 }, 2.1)
     .fromTo('.map__pt--gru', { opacity: 0, scale: 0.4, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: 0.3 }, 2.15)
@@ -232,7 +191,6 @@ export function initMotion() {
 
   const mm = gsap.matchMedia();
   initLenis();
-  hero();
   counters();
   reveals();
   vantagens();
