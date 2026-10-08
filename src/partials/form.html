@@ -1,0 +1,93 @@
+<!--
+  ENVIO DO FORMULÁRIO (src/js/form.js)
+  POST para https://formspree.io/f/FORMSPREE_ID (config.js). Só com resposta ok redireciona para obrigado.html.
+  Em falha (ou FORMSPREE_ID vazio), mostra erro com botão para enviar pelo WhatsApp.
+-->
+<form class="qform" id="qform" data-r="form" novalidate<!--if:FORMSPREE_ID--> action="https://formspree.io/f/{{FORMSPREE_ID}}" method="POST"<!--/if:FORMSPREE_ID-->>
+  <h3>Solicitar cotação</h3>
+  <p class="qform__hint">Campos com * são obrigatórios.</p>
+  <div class="fgrid">
+    <p class="legend">Seus dados</p>
+    <div class="f">
+      <label for="nome">Nome *</label>
+      <input id="nome" name="nome" type="text" required autocomplete="name" aria-describedby="nome-err">
+      <p class="f__err" id="nome-err" hidden>Informe seu nome.</p>
+    </div>
+    <div class="f">
+      <label for="empresa">Empresa *</label>
+      <input id="empresa" name="empresa" type="text" required autocomplete="organization" aria-describedby="empresa-err">
+      <p class="f__err" id="empresa-err" hidden>Informe o nome da empresa.</p>
+    </div>
+    <div class="f">
+      <label for="telefone">WhatsApp / Telefone *</label>
+      <input id="telefone" name="telefone" type="tel" required inputmode="tel" autocomplete="tel-national" placeholder="(85) 90000-0000" maxlength="15" aria-describedby="telefone-err">
+      <p class="f__err" id="telefone-err" hidden>Informe um telefone com DDD.</p>
+    </div>
+    <div class="f">
+      <label for="email">E-mail *</label>
+      <input id="email" name="email" type="email" required autocomplete="email" aria-describedby="email-err">
+      <p class="f__err" id="email-err" hidden>Informe um e-mail válido.</p>
+    </div>
+
+    <p class="legend">Dados da carga</p>
+    <div class="f">
+      <label for="origem">Origem (cidade/UF) *</label>
+      <input id="origem" name="origem" type="text" required placeholder="Fortaleza/CE" aria-describedby="origem-err">
+      <p class="f__err" id="origem-err" hidden>Informe a cidade de origem.</p>
+    </div>
+    <div class="f">
+      <label for="destino">Destino (cidade/UF) *</label>
+      <input id="destino" name="destino" type="text" required placeholder="São Paulo/SP" aria-describedby="destino-err">
+      <p class="f__err" id="destino-err" hidden>Informe a cidade de destino.</p>
+    </div>
+    <fieldset class="f full">
+      <legend>Modal</legend>
+      <div class="modal-opts">
+        <label><input type="radio" name="modal" value="Aéreo">Aéreo</label>
+        <label><input type="radio" name="modal" value="Rodoviário">Rodoviário</label>
+        <label><input type="radio" name="modal" value="Ainda não sei" checked>Ainda não sei</label>
+      </div>
+    </fieldset>
+    <div class="f full">
+      <label for="tipo">Tipo de carga *</label>
+      <select id="tipo" name="tipo_carga" required aria-describedby="tipo-err">
+        <option value="">Selecione</option>
+        <option>Carga geral / varejo</option>
+        <option>Vestuário e calçados</option>
+        <option>Farmacêutico / químico / perigoso</option>
+        <option>Cosméticos e perfumaria</option>
+        <option>Eletrônicos e telecom</option>
+        <option>Outro</option>
+      </select>
+      <p class="f__err" id="tipo-err" hidden>Selecione o tipo de carga.</p>
+    </div>
+    <div class="f full">
+      <label for="peso">Peso aproximado (kg)</label>
+      <input id="peso" name="peso" type="number" inputmode="decimal" min="0" step="any">
+    </div>
+    <div class="f full">
+      <label for="obs">Observações</label>
+      <textarea id="obs" name="observacoes" rows="3" placeholder="Dimensões, valor da mercadoria, prazo desejado, frequência de envios..."></textarea>
+    </div>
+    <div class="consent full">
+      <input type="checkbox" id="lgpd" name="lgpd" value="sim" required aria-describedby="lgpd-err">
+      <label for="lgpd">Autorizo o contato da Goldline sobre esta cotação, conforme a <a href="politica-de-privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.</label>
+      <p class="f__err" id="lgpd-err" hidden>Para enviar, autorize o contato conforme a Política de Privacidade.</p>
+    </div>
+  </div>
+
+  <input type="hidden" name="origem_pagina" value="direto">
+  <input type="hidden" name="utm_source">
+  <input type="hidden" name="utm_medium">
+  <input type="hidden" name="utm_campaign">
+  <input type="hidden" name="gclid">
+  <input type="hidden" name="fbclid">
+  <input type="hidden" name="_subject" value="Pedido de cotação pelo site">
+  <div class="hp" aria-hidden="true"><label for="gotcha">Não preencha este campo</label><input type="text" id="gotcha" name="_gotcha" tabindex="-1" autocomplete="off"></div>
+
+  <button type="submit" class="btn btn-gold qform__submit"><span class="qform__spinner" aria-hidden="true"></span><span class="qform__label">Enviar pedido de cotação</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+  <div class="qform__status" id="qformStatus" role="alert" hidden>
+    <p class="qform__msg"></p>
+    <a href="{{wa:hero}}" class="btn btn-wa" id="qformWa" target="_blank" rel="noopener" data-wa-origem="formulario-erro" hidden><svg aria-hidden="true"><use href="#i-wa"/></svg>Enviar pelo WhatsApp</a>
+  </div>
+</form>

@@ -1,0 +1,17 @@
+/* Estados iniciais das animações.
+   Só valem com .mo no <html> (JS ativo e movimento permitido). Se o bundle de animação
+   não carregar em 3,5s, o script do <head> remove .mo e tudo aparece no estado final. */
+.mo:not(.mo-ready) .hero__title{visibility:hidden}
+.mo:not(.mo-ready) .hero__eyebrow,.mo:not(.mo-ready) .hero__sub,.mo:not(.mo-ready) .hero__ctas,.mo:not(.mo-ready) .hero__tags li{opacity:0}
+.mo:not(.mo-ready) .curve circle{stroke-dasharray:1;stroke-dashoffset:1}
+.mo:not(.mo-ready) [data-r]{opacity:0}
+.mo:not(.mo-ready) .adv-img{clip-path:inset(0 100% 0 0)}
+.mo:not(.mo-ready) .seg,.mo:not(.mo-ready) .adv{opacity:0}
+.mo:not(.mo-ready) .award-photos img{clip-path:inset(0 0 100% 0)}
+.mo:not(.mo-ready) .cert__check circle,.mo:not(.mo-ready) .cert__check path{stroke-dasharray:1;stroke-dashoffset:1}
+.mo:not(.mo-ready) .steps__fill{transform:scaleY(0)}
+.mo:not(.mo-ready) .stat__div{transform:scaleY(0)}
+.mo:not(.mo-ready) .map__land{fill-opacity:0;stroke-dasharray:1;stroke-dashoffset:1}
+.mo:not(.mo-ready) .map__route-mask{stroke-dasharray:1;stroke-dashoffset:1}
+.mo:not(.mo-ready) .map__route-dash,.mo:not(.mo-ready) .map__pt,.mo:not(.mo-ready) .map__label{opacity:0}
+.mo:not(.mo-ready) .fgrid > *{opacity:0}

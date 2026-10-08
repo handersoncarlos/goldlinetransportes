@@ -1,0 +1,78 @@
+:root{
+  /* Cores da marca (versão 1) */
+  --gold:#E5BE55;
+  --gold-hover:#F0CD6C;
+  --gold-dark:#C9A23F;
+  --gold-soft:#F7EFD9;
+  --ink:#1A1A1A;
+  --ink-2:#232323;
+  --ink-3:#2E2E2E;
+  --text:#2B2B2B;
+  --muted:#6B6B6B;
+  --line:#E7E2D6;
+  --bg:#FFFFFF;
+  --bg-alt:#F6F4EF;
+
+  /* Dourado para texto em fundo claro (AA): --gold-dark sobre branco dá 2,4:1 */
+  --gold-title:#9A7A24;   /* títulos grandes: 4,05:1 no branco, 3,7:1 no --bg-alt */
+  --gold-text:#876818;    /* texto pequeno: 5,2:1 no branco, 4,75:1 no --bg-alt */
+
+  /* Fundo escuro */
+  --on-dark:#E9E9E9;
+  --on-dark-muted:#BDBDBD;
+  --on-dark-soft:#ADADAD;
+  --line-dark:#333333;
+  --footer-bg:#111111;
+  --footer-text:#9A9A9A;
+  --stat-label:#3A3220;
+  --wa:#25D366;
+  --wa-ink:#0B3D20;
+  --error:#B3261E;
+  --error-bg:#FDECEA;
+
+  /* Layout */
+  --radius:14px;
+  --radius-sm:10px;
+  --radius-md:12px;
+  --radius-pill:999px;
+  --max:1200px;
+  --gutter:20px;
+  --section-y:96px;
+  --header-h:72px;
+  --header-h-compact:60px;
+
+  /* Tipografia */
+  --font-display:'Archivo', 'Archivo Fallback 80', Arial, sans-serif;
+  --font-display-72:'Archivo', 'Archivo Fallback 72', Arial, sans-serif;
+  --font-body:'Montserrat', 'Montserrat Fallback', Arial, sans-serif;
+  --fs-base:1rem;
+  --fs-h1:clamp(2.4rem, 6.4vw, 5.2rem);
+  --fs-h2:clamp(2rem, 4.2vw, 3rem);
+  --fs-h3:1.5rem;
+  --fs-eyebrow:.78rem;
+  --fs-small:.9rem;
+
+  /* Sombras */
+  --shadow-card:0 18px 40px rgba(0,0,0,.08);
+  --shadow-form:0 24px 50px rgba(0,0,0,.06);
+  --shadow-float:0 10px 28px rgba(37,211,102,.45);
+  --shadow-pop:0 16px 40px rgba(0,0,0,.15);
+  --ring:0 0 0 4px rgba(229,190,85,.35);
+
+  /* Movimento (CSS). Os tokens do GSAP estão em src/js/motion.js */
+  --ease:cubic-bezier(.22,1,.36,1);
+  --dur-fast:.2s;
+  --dur:.4s;
+
+  /* Camadas */
+  --z-header:50;
+  --z-float:60;
+  --z-cookie:70;
+  --z-skip:100;
+}
+@media (max-width:860px){
+  :root{ --section-y:72px; }
+}
+@media (max-width:560px){
+  :root{ --gutter:16px; }
+}

@@ -1,0 +1,56 @@
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <a href="{{HOME}}#topo" class="logo" aria-label="Goldline Transportes, início"><img src="/img/logo-goldline-branco.webp" alt="Goldline Transportes" width="165" height="40" loading="lazy" decoding="async"></a>
+        <p>Transporte de cargas aéreo e rodoviário para todo o Brasil.</p>
+        <div class="social">
+          <a href="{{INSTAGRAM_URL}}" target="_blank" rel="noopener" aria-label="Instagram da Goldline"><svg><use href="#i-ig"/></svg></a>
+          <!-- TODO 5: Facebook aparece quando FACEBOOK_URL for preenchido em config.js -->
+          <!--if:FACEBOOK_URL--><a href="{{FACEBOOK_URL}}" target="_blank" rel="noopener" aria-label="Facebook da Goldline"><svg><use href="#i-fb"/></svg></a><!--/if:FACEBOOK_URL-->
+          <a href="{{wa:flutuante}}" target="_blank" rel="noopener" data-wa-origem="rodape" aria-label="WhatsApp da Goldline"><svg><use href="#i-wa"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <h2 class="footer__h">Soluções</h2>
+        <ul>
+          <li><a href="{{HOME}}#solucoes">Transporte aéreo</a></li>
+          <li><a href="{{HOME}}#solucoes">Transporte rodoviário</a></li>
+          <li><a href="{{HOME}}#solucoes">Farmacêuticos e perigosos</a></li>
+          <li><a href="{{HOME}}#cotacao" data-cta="rodape">Solicitar cotação</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="footer__h">Fortaleza / CE</h2>
+        <ul>
+          <li>Rua Paraguaçu, 825, Serrinha</li>
+          <li><a href="tel:+558534692888" data-unidade="fortaleza">(85) 3469-2888</a></li>
+          <li><a href="mailto:sac@goldlinetransportes.com.br">sac@goldlinetransportes.com.br</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="footer__h">Guarulhos / SP</h2>
+        <ul>
+          <li>Av. Santa Ifigênia, 721, Vila Paraíso</li>
+          <li><a href="tel:+551124887888" data-unidade="guarulhos">(11) 2488-7888</a></li>
+          <li><a href="mailto:comercial@goldlinetransportes.com.br">comercial@goldlinetransportes.com.br</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__legal">
+      <!-- TODO 2: confirmar razão social e CNPJ (config.js) -->
+      <p>{{RAZAO_SOCIAL}} · CNPJ {{CNPJ}}</p>
+      <p class="footer__links"><a href="{{HOME}}politica-de-privacidade.html">Política de Privacidade</a><span aria-hidden="true">·</span><button type="button" class="linklike" data-cookie-prefs>Preferências de cookies</button><span aria-hidden="true">·</span><span>© <span data-year>{{YEAR}}</span> Goldline Transportes</span></p>
+    </div>
+  </div>
+</footer>
+
+<a href="{{wa:flutuante}}" class="wa-float" target="_blank" rel="noopener" data-wa-origem="flutuante" aria-label="Falar no WhatsApp"><svg><use href="#i-wa"/></svg></a>
+
+<div class="cookie" id="cookie" role="region" aria-label="Aviso de cookies" hidden>
+  <p>Usamos cookies para medir o desempenho do site e das campanhas. Você pode aceitar ou recusar.</p>
+  <div class="cookie__actions">
+    <button type="button" class="btn btn-gold" data-consent="granted">Aceitar</button>
+    <button type="button" class="btn btn-line" data-consent="denied">Recusar</button>
+  </div>
+</div>

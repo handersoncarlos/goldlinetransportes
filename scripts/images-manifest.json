@@ -1,0 +1,317 @@
+{
+  "hero-estrada": {
+    "w": 1752,
+    "h": 1168,
+    "sizes": [
+      {
+        "w": 480,
+        "width": 480,
+        "height": 320
+      },
+      {
+        "w": 960,
+        "width": 960,
+        "height": 640
+      },
+      {
+        "w": 1600,
+        "width": 1600,
+        "height": 1067
+      }
+    ]
+  },
+  "frota": {
+    "w": 1400,
+    "h": 1400,
+    "sizes": [
+      {
+        "w": 480,
+        "width": 480,
+        "height": 480
+      },
+      {
+        "w": 960,
+        "width": 960,
+        "height": 960
+      },
+      {
+        "w": 1600,
+        "width": 1400,
+        "height": 1400
+      }
+    ]
+  },
+  "galpao": {
+    "w": 1600,
+    "h": 1065,
+    "sizes": [
+      {
+        "w": 480,
+        "width": 480,
+        "height": 320
+      },
+      {
+        "w": 960,
+        "width": 960,
+        "height": 639
+      },
+      {
+        "w": 1600,
+        "width": 1600,
+        "height": 1065
+      }
+    ]
+  },
+  "parceria": {
+    "w": 1600,
+    "h": 1067,
+    "sizes": [
+      {
+        "w": 480,
+        "width": 480,
+        "height": 320
+      },
+      {
+        "w": 960,
+        "width": 960,
+        "height": 640
+      },
+      {
+        "w": 1600,
+        "width": 1600,
+        "height": 1067
+      }
+    ]
+  },
+  "aviao": {
+    "w": 1600,
+    "h": 1067,
+    "sizes": [
+      {
+        "w": 480,
+        "width": 480,
+        "height": 320
+      },
+      {
+        "w": 960,
+        "width": 960,
+        "height": 640
+      },
+      {
+        "w": 1600,
+        "width": 1600,
+        "height": 1067
+      }
+    ]
+  },
+  "aviao-2": {
+    "w": 1600,
+    "h": 1066,
+    "sizes": [
+      {
+        "w": 480,
+        "width": 480,
+        "height": 320
+      },
+      {
+        "w": 960,
+        "width": 960,
+        "height": 640
+      },
+      {
+        "w": 1600,
+        "width": 1600,
+        "height": 1066
+      }
+    ]
+  },
+  "caminhao": {
+    "w": 1400,
+    "h": 1190,
+    "sizes": [
+      {
+        "w": 480,
+        "width": 480,
+        "height": 408
+      },
+      {
+        "w": 960,
+        "width": 960,
+        "height": 816
+      },
+      {
+        "w": 1600,
+        "width": 1400,
+        "height": 1190
+      }
+    ]
+  },
+  "premio-040.webp": {
+    "w": 288,
+    "h": 384
+  },
+  "premio-041.webp": {
+    "w": 360,
+    "h": 480
+  },
+  "premio-042.webp": {
+    "w": 384,
+    "h": 480
+  },
+  "premio-043.webp": {
+    "w": 480,
+    "h": 320
+  },
+  "premio-044.webp": {
+    "w": 288,
+    "h": 384
+  },
+  "premio-045.webp": {
+    "w": 512,
+    "h": 384
+  },
+  "azul-cargo-express": {
+    "w": 168,
+    "h": 128
+  },
+  "gollog": {
+    "w": 307,
+    "h": 128
+  },
+  "latam-cargo": {
+    "w": 205,
+    "h": 128
+  },
+  "clientes/aramis": {
+    "w": 176,
+    "h": 26
+  },
+  "clientes/avenida": {
+    "w": 162,
+    "h": 33
+  },
+  "clientes/brooksfield": {
+    "w": 240,
+    "h": 112
+  },
+  "clientes/cabana-del-primo": {
+    "w": 116,
+    "h": 95
+  },
+  "clientes/case": {
+    "w": 240,
+    "h": 78
+  },
+  "clientes/cea": {
+    "w": 143,
+    "h": 96
+  },
+  "clientes/coco-bambu": {
+    "w": 193,
+    "h": 112
+  },
+  "clientes/dudalina": {
+    "w": 169,
+    "h": 95
+  },
+  "clientes/eskala": {
+    "w": 156,
+    "h": 41
+  },
+  "clientes/globo": {
+    "w": 115,
+    "h": 112
+  },
+  "clientes/grazziotin": {
+    "w": 150,
+    "h": 54
+  },
+  "clientes/hapvida": {
+    "w": 191,
+    "h": 112
+  },
+  "clientes/harrys": {
+    "w": 120,
+    "h": 93
+  },
+  "clientes/hering": {
+    "w": 240,
+    "h": 31
+  },
+  "clientes/loungerie": {
+    "w": 188,
+    "h": 48
+  },
+  "clientes/luzeiros": {
+    "w": 100,
+    "h": 112
+  },
+  "clientes/malwee": {
+    "w": 240,
+    "h": 36
+  },
+  "clientes/marisa": {
+    "w": 240,
+    "h": 52
+  },
+  "clientes/pernambucanas": {
+    "w": 240,
+    "h": 73
+  },
+  "clientes/renner": {
+    "w": 240,
+    "h": 45
+  },
+  "clientes/riachuelo": {
+    "w": 240,
+    "h": 81
+  },
+  "clientes/sergio-k": {
+    "w": 211,
+    "h": 31
+  },
+  "clientes/taco": {
+    "w": 190,
+    "h": 70
+  },
+  "clientes/telefonica": {
+    "w": 240,
+    "h": 67
+  },
+  "clientes/tng": {
+    "w": 110,
+    "h": 86
+  },
+  "clientes/torra": {
+    "w": 140,
+    "h": 66
+  },
+  "clientes/toyota": {
+    "w": 177,
+    "h": 30
+  },
+  "clientes/unimed": {
+    "w": 159,
+    "h": 112
+  },
+  "clientes/via-veneto": {
+    "w": 142,
+    "h": 76
+  },
+  "clientes/vivo": {
+    "w": 240,
+    "h": 75
+  },
+  "clientes/zinzane": {
+    "w": 139,
+    "h": 80
+  },
+  "logo-goldline": {
+    "w": 348,
+    "h": 84
+  },
+  "logo-goldline-branco": {
+    "w": 348,
+    "h": 84
+  }
+}

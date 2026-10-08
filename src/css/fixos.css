@@ -1,0 +1,17 @@
+/* WhatsApp flutuante: sobe acima do banner de cookies e some quando o botão de envio do formulário está na tela */
+.wa-float{position:fixed;right:20px;bottom:calc(20px + var(--cookie-h, 0px));z-index:var(--z-float);width:60px;height:60px;border-radius:50%;background:var(--wa);color:#fff;display:grid;place-items:center;box-shadow:var(--shadow-float);transition:transform .3s var(--ease),opacity .3s var(--ease),bottom .3s var(--ease)}
+.wa-float svg{width:32px;height:32px}
+.wa-float.is-hidden{opacity:0;transform:scale(.6);pointer-events:none;visibility:hidden;transition:transform .3s var(--ease),opacity .3s var(--ease),visibility 0s .3s}
+@media (hover:hover){ .wa-float:hover{transform:scale(1.07)} }
+.menu-open .wa-float{opacity:0;pointer-events:none}
+
+.cookie{position:fixed;left:20px;bottom:20px;z-index:var(--z-cookie);max-width:420px;background:#fff;border:1px solid var(--line);border-radius:var(--radius-md);padding:18px;box-shadow:var(--shadow-pop);font-size:.9rem}
+.cookie[hidden]{display:none}
+.cookie p{margin-bottom:12px;color:var(--text)}
+.cookie__actions{display:flex;gap:10px;flex-wrap:wrap}
+.cookie .btn{min-height:44px;padding:10px 22px;font-size:.88rem}
+
+@media (max-width:560px){
+  .cookie{left:12px;right:12px;bottom:12px;max-width:none}
+  .wa-float{right:16px;bottom:calc(16px + var(--cookie-h, 0px));width:56px;height:56px}
+}

@@ -1,0 +1,54 @@
+.quote{display:grid;grid-template-columns:.85fr 1.15fr;gap:56px;align-items:start}
+.quote-side__list{display:grid;gap:14px;margin:26px 0 30px}
+.quote-side__list li{display:flex;gap:12px;align-items:flex-start;font-size:.95rem}
+.quote-side__list svg{width:22px;height:22px;color:var(--gold-text);flex:none;margin-top:1px}
+.contact-line{display:grid;gap:4px;padding-top:24px;border-top:1px solid var(--line)}
+.contact-line a{display:inline-flex;gap:10px;align-items:center;min-height:44px;font-weight:600;color:var(--ink);font-size:.95rem;overflow-wrap:anywhere}
+.contact-line a:hover{color:var(--gold-text)}
+.contact-line svg{width:18px;height:18px;color:var(--gold-text);flex:none}
+
+.qform{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:34px;box-shadow:var(--shadow-form)}
+.qform h3{font-size:1.8rem;font-stretch:80%;margin-bottom:4px}
+.qform__hint{font-size:.88rem;color:var(--muted);margin-bottom:22px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.full{grid-column:1/-1}
+fieldset.f{border:0}
+.f label,.f legend{font-size:.78rem;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.06em}
+.f legend{margin-bottom:6px}
+.f input,.f select,.f textarea{width:100%;min-height:48px;font-family:var(--font-body);font-size:1rem;padding:12px 14px;border:1.5px solid var(--line);border-radius:var(--radius-sm);background:var(--bg-alt);color:var(--text);transition:border-color var(--dur-fast),background-color var(--dur-fast),box-shadow var(--dur-fast)}
+.f select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231A1A1A' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:18px;padding-right:40px}
+.f textarea{min-height:96px;resize:vertical}
+.f input::placeholder,.f textarea::placeholder{color:#767676}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--gold-dark);background-color:#fff;box-shadow:var(--ring)}
+.f [aria-invalid="true"]{border-color:var(--error);background-color:#fff}
+.f__err{font-size:.82rem;font-weight:600;color:var(--error)}
+.legend{grid-column:1/-1;font-size:.8rem;font-weight:700;color:var(--gold-text);text-transform:uppercase;letter-spacing:.12em;margin-top:8px;padding-top:12px;border-top:1px dashed var(--line)}
+.legend:first-child{border:0;margin:0;padding:0}
+.modal-opts{display:flex;gap:10px;flex-wrap:wrap}
+.modal-opts label{display:flex;align-items:center;gap:8px;min-height:44px;padding:10px 16px;border:1.5px solid var(--line);border-radius:var(--radius-pill);font-size:.88rem;font-weight:600;cursor:pointer;text-transform:none;letter-spacing:0;background:var(--bg-alt);transition:border-color var(--dur-fast),background-color var(--dur-fast)}
+.modal-opts input{accent-color:var(--gold-text);width:18px;height:18px;min-height:0}
+.modal-opts label:has(input:checked){border-color:var(--gold-dark);background:var(--gold-soft)}
+.modal-opts label:has(input:focus-visible){box-shadow:var(--ring)}
+.consent{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:start;font-size:.85rem;color:var(--muted)}
+.consent input{width:22px;height:22px;margin-top:1px;accent-color:var(--gold-text)}
+.consent label{cursor:pointer}
+.consent a{text-decoration:underline;color:var(--ink)}
+.consent .f__err{grid-column:2}
+.hp{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+
+.qform__submit{position:relative;width:100%;margin-top:20px;min-height:56px}
+.qform__spinner{display:none;width:18px;height:18px;border-radius:50%;border:2px solid rgba(26,26,26,.25);border-top-color:var(--ink);animation:spin .8s linear infinite}
+.qform.is-sending .qform__spinner{display:block}
+.qform.is-sending .qform__submit svg{display:none}
+.qform.is-sending .qform__submit{cursor:progress;opacity:.85}
+@keyframes spin{to{transform:rotate(360deg)}}
+.qform__status{margin-top:14px;padding:16px;border-radius:var(--radius-sm);background:var(--error-bg);color:var(--error);font-size:.92rem;font-weight:600}
+.qform__status.is-info{background:var(--gold-soft);color:var(--ink)}
+.qform__status .btn{margin-top:12px}
+
+@media (max-width:860px){ .quote{grid-template-columns:1fr;gap:36px} }
+@media (max-width:560px){
+  .qform{padding:24px 18px}
+  .fgrid{grid-template-columns:1fr}
+}

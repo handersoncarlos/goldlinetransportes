@@ -1,0 +1,24 @@
+<meta name="theme-color" content="#1A1A1A">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" href="/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
+<script>
+/* Antes de qualquer outro script: classe .js, consentimento padrão negado e carga do GTM só com aceite. */
+(function(){
+  var d=document.documentElement;d.classList.add('js');
+  var rm=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!rm){d.classList.add('mo');setTimeout(function(){if(!d.classList.contains('mo-ready'))d.classList.remove('mo');},3500);}
+  window.dataLayer=window.dataLayer||[];
+  window.gtag=function(){window.dataLayer.push(arguments);};
+  gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});
+  var c=null;try{var r=JSON.parse(localStorage.getItem('gl_consent'));if(r&&Date.now()-r.t<15552e6)c=r.v;}catch(e){}
+  window.__glConsent=c;
+  window.__glLoadGTM=function(){
+    var id='{{GTM_ID}}';if(!id||window.__glGTM)return;window.__glGTM=1;
+    window.dataLayer.push({'gtm.start':Date.now(),event:'gtm.js'});
+    var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtm.js?id='+id;document.head.appendChild(s);
+  };
+  if(c==='granted'){gtag('consent','update',{ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted',analytics_storage:'granted'});window.__glLoadGTM();}
+})();
+</script>
