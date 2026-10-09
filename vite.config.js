@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import * as cfg from './src/js/config.js';
 import { FAQ } from './src/data/faq.js';
 import { VIEWBOX, BRASIL_PATH, CIDADES } from './src/data/brasil.js';
+import { BASE, HOMOLOG, AMBIENTE, OUT_DIR } from './scripts/site-env.mjs';
 
 const root = import.meta.dirname;
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -66,7 +67,8 @@ function renderMap() {
 // <!--include:nome-->           insere src/partials/nome.html
 // <!--if:CHAVE--> ... <!--/if:CHAVE-->       mantém só se a chave do config.js tiver valor
 // <!--ifnot:CHAVE--> ... <!--/ifnot:CHAVE--> mantém só se a chave estiver vazia
-// {{CHAVE}}  valor do config.js     {{wa:origem}} link do WhatsApp     {{HOME}} prefixo da home
+// {{CHAVE}}  valor do config.js     {{wa:origem}} link do WhatsApp
+// {{BASE}} base do site (/ ou /novosite/)     {{HOME}} prefixo das âncoras da home ('' na home, {{BASE}} nas outras)
 function template() {
   return {
     name: 'goldline-template',
@@ -86,7 +88,9 @@ function template() {
           return esc(cfg.waLink(w.numero, w.msg));
         });
         const vars = {
-          HOME: isHome ? '' : './',
+          HOME: isHome ? '' : BASE,
+          BASE,
+          SITE_AMBIENTE: AMBIENTE,
           YEAR: String(new Date().getFullYear()),
           STATS: renderStats(),
           FAQ: renderFaq(),
@@ -98,6 +102,13 @@ function template() {
           if (k in cfg && typeof cfg[k] === 'string') return esc(cfg[k]);
           throw new Error(`Placeholder desconhecido em ${page}: ${m}`);
         });
+        // data-src / data-srcset (fotos com carregamento adiado) não passam pelo Vite: aplica a base aqui
+        html = html.replace(/(data-src(?:set)?)="([^"]*)"/g, (_, attr, val) => `${attr}="${val.replace(/(^|,\s*)\/(?!\/)/g, `$1${BASE}`)}"`);
+        // Homologação: fora do Google em todas as páginas (o build da raiz não leva este bloqueio)
+        if (HOMOLOG) {
+          html = html.replace(/\s*<meta name="robots"[^>]*>/g, '');
+          html = html.replace('<meta name="viewport" content="width=device-width, initial-scale=1">', '<meta name="viewport" content="width=device-width, initial-scale=1">\n<meta name="robots" content="noindex, nofollow">');
+        }
         return html;
       },
     },
@@ -105,9 +116,11 @@ function template() {
 }
 
 export default defineConfig({
-  base: './',
+  base: BASE,
   plugins: [template()],
   build: {
+    outDir: OUT_DIR,
+    emptyOutDir: true,
     target: 'es2020',
     assetsInlineLimit: 0,
     rollupOptions: {

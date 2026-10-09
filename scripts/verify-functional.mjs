@@ -4,6 +4,8 @@ import { chromium } from 'playwright-core';
 import { WA } from '../src/js/config.js';
 
 const [BASE = 'http://localhost:4173/', TEST = 'http://localhost:4174/'] = process.argv.slice(2);
+// Homologação (subdiretório): páginas com noindex, sem robots.txt e sitemap
+const HOMOLOG = new URL(BASE).pathname !== '/';
 const browser = await chromium.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' });
 const results = [];
 const check = (name, ok, detail = '') => { results.push({ ok: !!ok, name, detail }); };
@@ -303,7 +305,7 @@ const VALID = { nome: 'Teste Silva', empresa: 'Empresa Teste', telefone: '859999
   check('area_cliente_click com origem menu e sistema_gestao', ev.filter((e) => e.event === 'area_cliente_click').map((e) => e.origem).join() === 'menu,sistema_gestao', JSON.stringify(ev.filter((e) => e.event === 'area_cliente_click')));
   check('phone_click e whatsapp_click do rodapé com origem', ev.some((e) => e.event === 'phone_click' && e.origem === 'rodape_fortaleza') && ev.some((e) => e.event === 'whatsapp_click' && e.origem === 'rodape_guarulhos'));
   check('Rodapé sem e-mails nas colunas das unidades', (await page.$$('.footer__contact a[href^="mailto:"]')).length === 0);
-  check('Link Trabalhe Conosco no rodapé', (await page.$$('.footer__links a[href="trabalhe-conosco.html"]')).length === 1);
+  check('Link Trabalhe Conosco no rodapé', (await page.$$(`.footer__links a[href="${new URL(BASE).pathname}trabalhe-conosco.html"]`)).length === 1);
   check('7 segmentos', (await page.$$('.seg')).length === 7);
   check('4 selos, incluindo Polícia Federal em uma linha', await page.evaluate(() => { const b = [...document.querySelectorAll('.cert b')]; const pf = b.find((x) => x.textContent === 'POLÍCIA FEDERAL'); return b.length === 4 && pf && pf.scrollWidth <= pf.clientWidth + 1 && pf.getBoundingClientRect().height < 40; }));
   await page.evaluate(() => document.getElementById('premios').scrollIntoView());
@@ -368,11 +370,42 @@ const VALID = { nome: 'Teste Silva', empresa: 'Empresa Teste', telefone: '859999
   await page.evaluate(() => { addEventListener('click', (e) => { if (e.target.closest('a[href^="mailto:"]')) e.preventDefault(); }, true); document.querySelector('[data-curriculo]').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })); });
   const ev = (await dl(page)).filter((e) => e.event === 'curriculo_email_click').map((e) => e.acao);
   check('curriculo_email_click no botão e na cópia', ev.includes('mailto') && ev.includes('copiar'), ev.join());
-  check('Trabalhe Conosco: indexável', !(await page.$('meta[name="robots"]')));
+  if (HOMOLOG) check('Trabalhe Conosco: noindex na homologação', (await page.getAttribute('meta[name="robots"]', 'content')) === 'noindex, nofollow');
+  else check('Trabalhe Conosco: indexável', !(await page.$('meta[name="robots"]')));
   check('Sem erros de JS (Trabalhe Conosco)', page.errors.length === 0, page.errors.join(' | '));
-  const robots = await (await page.request.get(BASE + 'robots.txt')).text();
-  const sitemap = await (await page.request.get(BASE + 'sitemap.xml')).text();
-  check('robots.txt sem bloqueio do obrigado; sitemap com Trabalhe Conosco', !robots.includes('obrigado') && sitemap.includes('trabalhe-conosco.html'));
+  if (HOMOLOG) {
+    const r1 = await page.request.get(BASE + 'robots.txt'), r2 = await page.request.get(BASE + 'sitemap.xml');
+    check('Homologação sem robots.txt e sem sitemap.xml', r1.status() === 404 && r2.status() === 404, `${r1.status()} ${r2.status()}`);
+  } else {
+    const robots = await (await page.request.get(BASE + 'robots.txt')).text();
+    const sitemap = await (await page.request.get(BASE + 'sitemap.xml')).text();
+    check('robots.txt sem bloqueio do obrigado; sitemap com Trabalhe Conosco', !robots.includes('obrigado') && sitemap.includes('trabalhe-conosco.html'));
+  }
+  await ctx.close();
+}
+
+// Páginas, cabeçalhos e requisições -----------------------------------------------------------------
+{
+  const { ctx, page } = await newPage({ width: 390 });
+  const bad = [];
+  page.on('response', (r) => { const u = new URL(r.url()); if (u.host === new URL(BASE).host && r.status() >= 400 && !u.pathname.includes('teste/123')) bad.push(`${r.status()} ${u.pathname}`); });
+  const path0 = new URL(BASE).pathname;
+  for (const p of ['', 'politica-de-privacidade.html', 'trabalhe-conosco.html', 'obrigado.html']) {
+    const res = await page.goto(BASE + p, { waitUntil: 'networkidle' });
+    const h = res.headers();
+    const meta = await page.getAttribute('meta[name="robots"]', 'content').catch(() => null);
+    if (HOMOLOG) check(`${p || 'home'}: abre (200), X-Robots-Tag e meta noindex`, res.status() === 200 && h['x-robots-tag'] === 'noindex, nofollow' && meta === 'noindex, nofollow', `${res.status()} ${h['x-robots-tag']} ${meta}`);
+    else check(`${p || 'home'}: abre (200) sem X-Robots-Tag`, res.status() === 200 && !h['x-robots-tag']);
+    const links = await page.$$eval('a[href^="/"]', (els) => els.map((a) => a.getAttribute('href')));
+    check(`${p || 'home'}: links internos com a base ${path0}`, links.every((l) => l.startsWith(path0)), links.filter((l) => !l.startsWith(path0)).join(' '));
+    const h1 = await page.evaluate(() => { scrollTo(0, document.documentElement.scrollHeight); return true; });
+    await page.waitForTimeout(800);
+  }
+  const r404 = await page.goto(BASE + 'teste/123', { waitUntil: 'networkidle' });
+  const styled = await page.evaluate(() => getComputedStyle(document.body).backgroundColor === 'rgb(26, 26, 26)' && document.querySelector('header img').naturalWidth > 0 && document.fonts.check('800 40px Archivo'));
+  check('URL inexistente mostra a 404 com estilo, logo e fonte', r404.status() === 404 && styled);
+  check('404: link para a home com a base', (await page.getAttribute('a.btn', 'href')) === path0);
+  check('Nenhuma requisição com erro (fontes, imagens, JS, favicon)', bad.length === 0, bad.join(', '));
   await ctx.close();
 }
 

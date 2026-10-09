@@ -1,9 +1,14 @@
-// Depois do vite build: gera .htaccess (CSP com hash dos scripts inline), robots.txt e sitemap.xml em dist/.
+// Depois do vite build: CSS embutido, .htaccess (CSP com hash dos scripts inline), 404 com a base certa e,
+// só na publicação na raiz, robots.txt e sitemap.xml. A base vem de SITE_BASE (scripts/site-env.mjs).
 import { readFile, writeFile, readdir, rm } from 'node:fs/promises';
+import { BASE, IS_ROOT, HOMOLOG, OUT_DIR } from './site-env.mjs';
 import { createHash } from 'node:crypto';
 import { SITE_URL, YOUTUBE_ID } from '../src/js/config.js';
 
-const DIST = process.env.DIST || 'dist';
+const DIST = OUT_DIR;
+
+// 404 independente: troca %BASE% pela base do build
+await writeFile(`${DIST}/404.html`, (await readFile(`${DIST}/404.html`, 'utf8')).replaceAll('%BASE%', BASE));
 const htmlFiles = (await readdir(DIST)).filter((f) => f.endsWith('.html'));
 const assets = await readdir(`${DIST}/assets`);
 
@@ -15,14 +20,15 @@ const introDeps = introFile
   : [];
 for (const f of htmlFiles) {
   let html = await readFile(`${DIST}/${f}`, 'utf8');
-  const links = [...html.matchAll(/<link rel="stylesheet"[^>]*href="\.\/assets\/([^"]+\.css)"[^>]*>/g)];
+  const links = [...html.matchAll(/<link rel="stylesheet"[^>]*href="[^"]*assets\/([^"]+\.css)"[^>]*>/g)];
   for (const [tag, file] of links) {
-    const css = (await readFile(`${DIST}/assets/${file}`, 'utf8')).replaceAll('url(../', 'url(./');
+    // Com base absoluta as url() do CSS já saem com a base (ex.: /novosite/fonts/...)
+    const css = await readFile(`${DIST}/assets/${file}`, 'utf8');
     html = html.replace(tag, () => `<style>${css}</style>`);
   }
   if (f === 'index.html' && introFile) {
     // Só quando o movimento é permitido (classe .mo do script do <head>); com movimento reduzido nada é baixado
-    const list = JSON.stringify([introFile, ...introDeps].map((d) => `./assets/${d}`));
+    const list = JSON.stringify([introFile, ...introDeps].map((d) => `${BASE}assets/${d}`));
     const pre = `<script>(function(){if(!document.documentElement.classList.contains('mo'))return;${list}.forEach(function(h){var l=document.createElement('link');l.rel='modulepreload';l.crossOrigin='';l.href=h;document.head.appendChild(l);});})();</script>`;
     html = html.replace('</head>', `${pre}\n</head>`);
   }
@@ -63,21 +69,62 @@ const csp = [
 ].join('; ');
 
 const tpl = await readFile('scripts/htaccess.template', 'utf8');
-await writeFile(`${DIST}/.htaccess`, tpl.replace('__CSP__', csp));
+const rewrite = IS_ROOT
+  ? `# ---------------------------------------------------------------------------
+# HTTPS e domínio sem www (301)
+# ---------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} off [OR]
+  RewriteCond %{HTTP_HOST} ^www\\. [NC]
+  RewriteCond %{HTTP_HOST} ^(?:www\\.)?(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301,NE]
 
-await writeFile(`${DIST}/robots.txt`, `User-agent: *
-Allow: /
+  # /index.html -> /
+  RewriteCond %{THE_REQUEST} \\s/+index\\.html[\\s?] [NC]
+  RewriteRule ^index\\.html$ / [L,R=301]
+</IfModule>`
+  : `# ---------------------------------------------------------------------------
+# Subdiretório ${BASE}: só HTTPS. Regras de www e de domínio ficam no .htaccess da raiz.
+# ---------------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase ${BASE}
+  RewriteCond %{HTTPS} off
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
 
-Sitemap: ${SITE_URL}/sitemap.xml
-`);
+  # ${BASE}index.html -> ${BASE}
+  RewriteCond %{THE_REQUEST} \\s${BASE.replace(/\//g, '/+')}index\\.html[\\s?] [NC]
+  RewriteRule ^index\\.html$ ${BASE} [L,R=301]
+</IfModule>`;
+const robots = HOMOLOG ? '\n  # Homologação: fora dos buscadores\n  Header always set X-Robots-Tag "noindex, nofollow"' : '';
+await writeFile(`${DIST}/.htaccess`, tpl
+  .replace('__CENARIO__', IS_ROOT ? 'publicação na raiz' : `homologação em ${BASE}`)
+  .replace('__BASE__', BASE)
+  .replace('__REWRITE__', rewrite)
+  .replace('__ROBOTS__', robots)
+  .replace('__CSP__', csp));
 
-const today = new Date().toISOString().slice(0, 10);
-await writeFile(`${DIST}/sitemap.xml`, `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>${SITE_URL}/</loc><lastmod>${today}</lastmod><priority>1.0</priority></url>
-  <url><loc>${SITE_URL}/trabalhe-conosco.html</loc><lastmod>${today}</lastmod><priority>0.5</priority></url>
-  <url><loc>${SITE_URL}/politica-de-privacidade.html</loc><lastmod>${today}</lastmod><priority>0.3</priority></url>
-</urlset>
-`);
+// robots.txt e sitemap.xml só na publicação final (robots.txt só vale na raiz do domínio)
+if (IS_ROOT) {
+  await writeFile(`${DIST}/robots.txt`, `User-agent: *
+  Allow: /
 
-console.log(`postbuild: .htaccess (${hashes.size} hash de script inline), robots.txt e sitemap.xml em ${DIST}/`);
+  Sitemap: ${SITE_URL}/sitemap.xml
+  `);
+
+  const today = new Date().toISOString().slice(0, 10);
+  await writeFile(`${DIST}/sitemap.xml`, `<?xml version="1.0" encoding="UTF-8"?>
+  <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url><loc>${SITE_URL}/</loc><lastmod>${today}</lastmod><priority>1.0</priority></url>
+    <url><loc>${SITE_URL}/trabalhe-conosco.html</loc><lastmod>${today}</lastmod><priority>0.5</priority></url>
+    <url><loc>${SITE_URL}/politica-de-privacidade.html</loc><lastmod>${today}</lastmod><priority>0.3</priority></url>
+  </urlset>
+  `);
+
+} else {
+  await rm(`${DIST}/robots.txt`, { force: true });
+  await rm(`${DIST}/sitemap.xml`, { force: true });
+}
+
+console.log(`postbuild (${IS_ROOT ? 'raiz' : 'homologação ' + BASE}): .htaccess com ${hashes.size} hash de script inline${IS_ROOT ? ', robots.txt e sitemap.xml' : ', sem robots.txt e sitemap.xml'} em ${DIST}/`);

@@ -1,11 +1,13 @@
-// Servidor local de dist/ com os mesmos cabeçalhos do .htaccess (CSP inclusa), gzip e 404.
-// Uso: npm run preview  (porta 4173, ou PORT=xxxx)
+// Servidor local do build com os mesmos cabeçalhos do .htaccess (CSP e X-Robots-Tag inclusos), gzip e 404.
+// Simula o subdiretório quando SITE_BASE=/novosite/ (site em http://localhost:PORTA/novosite/).
+// Uso: npm run preview (raiz) ou npm run preview:novosite  (porta 4173, ou PORT=xxxx)
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { gzipSync } from 'node:zlib';
 import path from 'node:path';
+import { BASE, OUT_DIR } from './site-env.mjs';
 
-const DIST = path.resolve(process.env.DIST || 'dist');
+const DIST = path.resolve(OUT_DIR);
 const PORT = Number(process.env.PORT || 4173);
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
@@ -16,18 +18,22 @@ const COMPRESS = /\.(html|css|js|json|xml|txt|svg|ico)$/;
 
 const htaccess = await readFile(path.join(DIST, '.htaccess'), 'utf8');
 const headers = {};
-for (const m of htaccess.matchAll(/Header always set (\S+) "([^"]*)"/g)) headers[m[1]] = m[2];
+for (const m of htaccess.matchAll(/Header (?:always )?set (\S+) "([^"]*)"/g)) if (!m[0].includes('Cache-Control')) headers[m[1]] = m[2];
 // Local é http: sem HSTS e sem upgrade-insecure-requests
 delete headers['Strict-Transport-Security'];
 headers['Content-Security-Policy'] = headers['Content-Security-Policy'].replace('; upgrade-insecure-requests', '');
 
 createServer(async (req, res) => {
   let p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+  // Fora da base (ex.: /novosite sem a barra final): redireciona para a base, como o Apache faz com pastas
+  if (p === BASE.slice(0, -1)) { res.writeHead(301, { Location: BASE }); return res.end(); }
+  const inside = p.startsWith(BASE);
+  p = inside ? p.slice(BASE.length - 1) : p;
   if (p.endsWith('/')) p += 'index.html';
   let file = path.join(DIST, path.normalize(p));
   let status = 200;
   try {
-    if (!file.startsWith(DIST) || !(await stat(file)).isFile()) throw 0;
+    if (!inside || !file.startsWith(DIST) || !(await stat(file)).isFile()) throw 0;
   } catch {
     file = path.join(DIST, '404.html');
     status = 404;
@@ -42,4 +48,4 @@ createServer(async (req, res) => {
   }
   res.writeHead(status, h);
   res.end(body);
-}).listen(PORT, () => console.log(`dist/ em http://localhost:${PORT}`));
+}).listen(PORT, () => console.log(`${OUT_DIR}/ em http://localhost:${PORT}${BASE}`));

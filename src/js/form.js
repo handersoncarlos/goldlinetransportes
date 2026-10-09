@@ -114,7 +114,7 @@ export function initForm() {
 
       track('lead_form_submit', { modal: d.modal, tipo_carga: d.tipo_carga, origem_pagina: d.origem_pagina });
       try { sessionStorage.setItem(SUMMARY_KEY, JSON.stringify({ msg: buildWaMessage(d) })); } catch { /* sem armazenamento */ }
-      location.href = 'obrigado.html';
+      location.href = `${import.meta.env.BASE_URL}obrigado.html`;
     } catch {
       setSending(false);
       showStatus('Não foi possível enviar agora. Seus dados continuam no formulário: envie pelo WhatsApp ou tente de novo em instantes.', { wa: true });

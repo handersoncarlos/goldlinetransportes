@@ -10,6 +10,7 @@
   var rm=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(!rm){d.classList.add('mo');setTimeout(function(){if(!d.classList.contains('mo-ready'))d.classList.remove('mo');},3500);}
   window.dataLayer=window.dataLayer||[];
+  if('{{GTM_ID}}')window.dataLayer.push({site_ambiente:'{{SITE_AMBIENTE}}'});
   window.gtag=function(){window.dataLayer.push(arguments);};
   gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});
   var c=null;try{var r=JSON.parse(localStorage.getItem('gl_consent'));if(r&&Date.now()-r.t<15552e6)c=r.v;}catch(e){}

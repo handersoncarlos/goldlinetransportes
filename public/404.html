@@ -7,13 +7,13 @@
 <meta name="description" content="A página que você procurou não existe ou mudou de endereço. Volte para a página inicial da Goldline Transportes e solicite a sua cotação de frete.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#1A1A1A">
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<!-- Página independente com caminhos absolutos: funciona em qualquer URL inexistente -->
+<link rel="icon" href="%BASE%favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="%BASE%apple-touch-icon.png">
+<!-- Página independente com caminhos absolutos (%BASE% é trocado pela base no pós-build): funciona em qualquer URL inexistente -->
 <style>
-@font-face{font-family:'Archivo';src:url('/fonts/archivo-var-latin.woff2') format('woff2');font-weight:500 900;font-stretch:62% 100%;font-display:swap}
-@font-face{font-family:'Montserrat';src:url('/fonts/montserrat-latin-400-normal.woff2') format('woff2');font-weight:400;font-display:swap}
-@font-face{font-family:'Montserrat';src:url('/fonts/montserrat-latin-700-normal.woff2') format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'Archivo';src:url('%BASE%fonts/archivo-var-latin.woff2') format('woff2');font-weight:500 900;font-stretch:62% 100%;font-display:swap}
+@font-face{font-family:'Montserrat';src:url('%BASE%fonts/montserrat-latin-400-normal.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Montserrat';src:url('%BASE%fonts/montserrat-latin-700-normal.woff2') format('woff2');font-weight:700;font-display:swap}
 :root{--gold:#E5BE55;--gold-hover:#F0CD6C;--ink:#1A1A1A;--muted:#BDBDBD}
 *{box-sizing:border-box;margin:0;padding:0}
 body{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;background:var(--ink);color:#E9E9E9;font-family:'Montserrat',Arial,sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden}
@@ -32,14 +32,14 @@ a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
 </style>
 </head>
 <body>
-<header><a href="/" aria-label="Goldline Transportes, início"><img src="/img/logo-goldline.webp" alt="Goldline Transportes" width="157" height="38"></a></header>
+<header><a href="%BASE%" aria-label="Goldline Transportes, início"><img src="%BASE%img/logo-goldline.webp" alt="Goldline Transportes" width="157" height="38"></a></header>
 <main>
   <div class="c" aria-hidden="true"></div>
   <div class="in">
     <p class="eyebrow">Erro 404</p>
     <h1>Página <span>não encontrada</span></h1>
     <p>O endereço que você acessou não existe ou mudou de lugar.</p>
-    <a class="btn" href="/">Ir para a página inicial</a>
+    <a class="btn" href="%BASE%">Ir para a página inicial</a>
   </div>
 </main>
 </body>

@@ -2,6 +2,52 @@
 
 Site estático (HTML, CSS e JS) gerado com Vite. O pacote final é `goldline-v2-hostinger.zip`, com o **conteúdo** da pasta `dist/` na raiz (inclui o `.htaccess`).
 
+## 0. Homologação em /novosite
+
+Antes da publicação final, o site fica em `https://goldlinetransportes.com.br/novosite/` para o cliente aprovar, sem mexer no site atual da raiz.
+
+O mesmo código gera os dois cenários. A base vem da variável `SITE_BASE`, lida em `scripts/site-env.mjs`:
+
+| Comando | Base | Pasta gerada | Pacote |
+|---|---|---|---|
+| `npm run build:novosite` | `/novosite/` | `dist-novosite/` | `npm run zip:novosite` gera `goldline-novosite.zip` |
+| `npm run build` | `/` | `dist/` | `npm run zip` gera `goldline-v2-hostinger.zip` |
+
+O build de homologação é diferente do final em 5 pontos:
+- Todos os links e arquivos usam o prefixo `/novosite/`.
+- Todas as páginas têm `<meta name="robots" content="noindex, nofollow">`, e o `.htaccess` envia `X-Robots-Tag: noindex, nofollow`. Nada disso vai para o build final.
+- Não há `robots.txt` nem `sitemap.xml` (o `robots.txt` só vale na raiz do domínio).
+- O `.htaccess` só força HTTPS dentro de `/novosite/` (com `RewriteBase /novosite/` e 404 em `/novosite/404.html`) e não tem regras de www ou de domínio, para não afetar o site da raiz.
+- Com `GTM_ID` preenchido, o `dataLayer` recebe `site_ambiente: 'homologacao'` antes do GTM (no final, `'producao'`). No GTM, crie uma variável da camada de dados `site_ambiente` e use a condição `site_ambiente igual a producao` nos acionadores de conversão, para os testes não contarem como conversão real.
+
+Canonical, `og:url` e `og:image` apontam sempre para o endereço final na raiz.
+
+Passo a passo:
+
+1. Na Hostinger, abra o Gerenciador de Arquivos, entre em `public_html` e crie a pasta `novosite`.
+2. Envie `goldline-novosite.zip` para dentro de `novosite` e extraia ali. O `index.html` precisa ficar em `public_html/novosite/index.html` (o zip já tem os arquivos na raiz, sem subpasta). Ative "Mostrar arquivos ocultos" e confira se o `.htaccess` está em `public_html/novosite/`.
+3. Confirme que o SSL do domínio está ativo e acesse `https://goldlinetransportes.com.br/novosite/`.
+4. Opcional: proteja a pasta com senha em Avançado > Proteção de diretórios por senha, para só o cliente ver.
+5. Para a publicação final: rode `npm run build` e `npm run zip`, suba o conteúdo de `dist/` (ou o `goldline-v2-hostinger.zip`) na raiz seguindo a seção 1 e apague a pasta `novosite`.
+
+Formspree: o fluxo é o mesmo nos dois cenários (o redirecionamento vai para `/novosite/obrigado.html` na homologação e para `/obrigado.html` no final). Se o formulário tiver restrição de domínio (Settings > Restrict to domain), libere `goldlinetransportes.com.br`.
+
+Para conferir localmente:
+
+```bash
+npm run build:novosite
+```
+
+```bash
+npm run preview:novosite
+```
+
+O site abre em `http://localhost:4173/novosite/`, com os mesmos cabeçalhos do `.htaccess`. Para desenvolvimento com recarga automática na mesma base:
+
+```bash
+npm run dev:novosite
+```
+
 ## 1. Subir na Hostinger
 
 1. **Ative o SSL antes de tudo.** hPanel > Websites > Gerenciar > Segurança > SSL. Espere o status "Ativo". O `.htaccess` força HTTPS: sem SSL o site entra em loop.
@@ -44,7 +90,7 @@ npm run build
 npm run zip
 ```
 
-E repita a seção 1 com o novo `goldline-v2-hostinger.zip`.
+Para a homologação, use `npm run build:novosite` e `npm run zip:novosite` (seção 0). E repita a seção 1 com o novo `goldline-v2-hostinger.zip`.
 
 Outros pontos de edição:
 
@@ -118,7 +164,7 @@ Se o domínio antigo estiver em outro provedor, use o redirecionamento 301 do pa
 - DNS: domínio apontando para a Hostinger e SSL ativo.
 - GTM: criar o contêiner, colocar o ID em `config.js`, configurar as tags (seção 3) e publicar.
 - Formspree: criar o formulário, apontar para o e-mail comercial, colocar o ID em `config.js`. No Formspree, ative o filtro de spam e confira se o campo `_gotcha` é reconhecido.
-- Google Search Console: adicionar a propriedade, enviar `https://goldlinetransportes.com.br/sitemap.xml` e usar "Mudança de endereço" a partir do domínio antigo.
+- Google Search Console: adicionar a propriedade, enviar `https://goldlinetransportes.com.br/sitemap.xml` (só existe no build final) e usar "Mudança de endereço" a partir do domínio antigo.
 - Google Business Profile: atualizar o site das duas unidades.
 
 ## 6. Desenvolvimento e verificação
