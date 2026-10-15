@@ -47,6 +47,7 @@ const NOVAS_FOTOS = [
   ['vantagens', 'vantagens', `${SRC}/fotos/frota.webp`, { quality: 66, smallQuality: 50 }],
   ['sobre', 'sobre', `${SRC}/fotos/galpao.webp`, { quality: 66, smallQuality: 50 }],
   ['premiacao-nova', 'premiacao-nova', null],
+  ['premiacao-meli-air', 'premiacao-meli-air', null, { quality: 70 }],
 ];
 const faltando = [];
 for (const [nova, out, fallback, opts] of NOVAS_FOTOS) {
@@ -56,8 +57,20 @@ for (const [nova, out, fallback, opts] of NOVAS_FOTOS) {
 }
 await photo('parceria', `${SRC}/fotos/parceria.webp`);
 
+// Seção NR-1 (saúde mental e bem-estar): 8 fotos em _novas-imagens/nr1/. 480 e 960 na galeria, 1280 no lightbox.
+for (const f of (await readdir(`${NOVAS}/nr1`).catch(() => [])).filter((x) => /\.(jpe?g|png|webp)$/i.test(x)).sort()) {
+  const name = f.replace(/\.(jpe?g|png|webp)$/i, '');
+  const meta = await sharp(`${NOVAS}/nr1/${f}`).rotate().metadata();
+  const widths = [...new Set([480, 960, 1280].map((w) => Math.min(w, meta.width)))];
+  manifest[name] = { w: meta.width, h: meta.height, widths };
+  for (const width of widths) {
+    await sharp(`${NOVAS}/nr1/${f}`).rotate().resize(width).webp({ quality: width <= 480 ? 62 : 68, effort: 6 }).toFile(`${OUT}/${name}-${width}.webp`);
+  }
+}
+
 // Premiações: as 4 fotos do mosaico da versão 1, largura nativa
-for (const f of ['premio-040.webp', 'premio-042.webp', 'premio-043.webp', 'premio-045.webp']) {
+// 042 (troféu Avião Solidário) e 043 (grupo de máscara) saíram do mosaico nos Ajustes 03
+for (const f of ['premio-040.webp', 'premio-045.webp']) {
   const m = await sharp(`${SRC}/premios/${f}`).metadata();
   await sharp(`${SRC}/premios/${f}`).webp({ quality: 74 }).toFile(`${OUT}/${f}`);
   manifest[f] = { w: m.width, h: m.height };
@@ -77,11 +90,16 @@ for (const n of ['logo-latamcargo', 'logo-gollog', 'logo-azulcargo', 'logo-merca
 // Clientes: recorta o fundo, aplica a mesma margem interna transparente em todos e contém em 240x112 (2x) e 120x56 (1x).
 const clientesFiles = (await readdir(`${SRC}/clientes`)).filter((f) => f.endsWith('.png'));
 if (!clientesFiles.includes('cea.png') && (await findNova('cliente-cea'))) clientesFiles.push('cea.png');
+// Logos novos (JPG com fundo branco) em _novas-imagens/clientes/logo-<nome>.jpg
+const novosClientes = (await readdir(`${NOVAS}/clientes`).catch(() => [])).filter((f) => /^logo-.+\.(jpe?g|png)$/i.test(f));
+for (const f of novosClientes) clientesFiles.push(`novo:${f}`);
 for (const f of clientesFiles.sort()) {
-  const name = f.replace('.png', '');
+  const isNovo = f.startsWith('novo:');
+  const name = isNovo ? f.slice(5).replace(/^logo-/, '').replace(/\.(jpe?g|png)$/i, '') : f.replace('.png', '');
   // C&A: arquivo novo em _novas-imagens/cliente-cea.png (o antigo vinha cortado na base)
-  const src = name === 'cea' && (await findNova('cliente-cea')) ? await findNova('cliente-cea') : `${SRC}/clientes/${f}`;
-  const trimmed = await sharp(src).trim({ threshold: 4 }).png().toBuffer({ resolveWithObject: true });
+  const src = isNovo ? `${NOVAS}/clientes/${f.slice(5)}` : name === 'cea' && (await findNova('cliente-cea')) ? await findNova('cliente-cea') : `${SRC}/clientes/${f}`;
+  // JPG: fundo branco com ruído de compressão, recorte mais tolerante
+  const trimmed = await sharp(src).rotate().trim({ threshold: isNovo ? 24 : 4 }).png().toBuffer({ resolveWithObject: true });
   const pad = Math.round(Math.max(trimmed.info.width, trimmed.info.height) * 0.04);
   const padded = await sharp(trimmed.data)
     .extend({ top: pad, bottom: pad, left: pad, right: pad, background: { r: 0, g: 0, b: 0, alpha: 0 } })
@@ -98,7 +116,8 @@ for (const [src, out, h] of [
   ['logo-goldline-fundo-escuro', 'logo-goldline', 92],
   ['logo-rodape-goldline-branco', 'logo-goldline-branco', 80],
 ]) {
-  const info = await sharp(`${SRC}/logos/${src}.png`).resize({ height: h }).webp({ quality: 90, alphaQuality: 100 }).toFile(`${OUT}/${out}.webp`);
+  // Qualidade 80: logo nítido em 2x e mais leve na primeira tela
+  const info = await sharp(`${SRC}/logos/${src}.png`).resize({ height: h }).webp({ quality: 80, alphaQuality: 80, effort: 6 }).toFile(`${OUT}/${out}.webp`);
   manifest[out] = { w: info.width, h: info.height };
 }
 
@@ -127,7 +146,10 @@ pngs.forEach((buf, i) => {
 });
 await writeFile('public/favicon.ico', Buffer.concat([header, ...pngs]));
 
-// og-image 1200x630: hero-estrada + gradiente + curvas + logo
+// Logo em PNG para os dados estruturados (Organization.logo)
+await sharp(`${SRC}/logos/logo-topo-goldline.png`).resize({ width: 600 }).png({ compressionLevel: 9 }).toFile('public/logo-goldline.png');
+
+// og-image 1200x630: foto atual do hero + gradiente + curvas + logo
 const W = 1200, H = 630;
 const overlay = Buffer.from(`<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
   <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="0">
@@ -140,7 +162,7 @@ const overlay = Buffer.from(`<svg width="${W}" height="${H}" xmlns="http://www.w
   <rect x="80" y="420" width="120" height="4" fill="#E5BE55"/>
 </svg>`);
 const logo = await sharp(`${SRC}/logos/logo-goldline-fundo-escuro.png`).resize({ width: 560 }).png().toBuffer();
-await sharp(`${SRC}/fotos/hero-estrada.webp`)
+await sharp((await findNova('hero')) || `${SRC}/fotos/hero-estrada.webp`)
   .resize(W, H, { fit: 'cover' })
   .composite([{ input: overlay }, { input: logo, left: 80, top: 250 }])
   .jpeg({ quality: 82, mozjpeg: true })

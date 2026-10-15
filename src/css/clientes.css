@@ -22,6 +22,11 @@
 
 @media (min-width:1024px){ .clients-lead{max-width:none} }
 
-/* C&A: selo preto sólido; opacidade menor em repouso para equilibrar com os vizinhos */
+/* Logos JPG (fundo branco): multiply funde o branco com o card, sem retângulo aparente */
+.client--jpg img{mix-blend-mode:multiply}
+/* Selos escuros (C&A e Excelência Selects): opacidade menor em repouso para equilibrar com os vizinhos */
+.client img[alt="Excelência Selects"]{opacity:.5}
+.client:hover img[alt="Excelência Selects"]{opacity:1}
+/* C&A */
 .client img[alt="C&A"]{opacity:.5}
 .client:hover img[alt="C&A"]{opacity:1}

@@ -46,7 +46,7 @@
   --font-display-72:'Archivo', 'Archivo Fallback 72', Arial, sans-serif;
   --font-body:'Montserrat', 'Montserrat Fallback', Arial, sans-serif;
   --fs-base:1rem;
-  --fs-h1:clamp(2.4rem, 6.4vw, 5.2rem);
+  --fs-h1:clamp(1.75rem, 6.4vw, 5.2rem);
   --fs-h2:clamp(2rem, 4.2vw, 3rem);
   --fs-h3:1.5rem;
   --fs-eyebrow:.78rem;

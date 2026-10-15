@@ -1,0 +1,40 @@
+/* Saúde mental e bem-estar (NR-1) */
+.nr1-head{max-width:780px}
+.nr1-head__text{margin-top:14px;color:var(--text)}
+.nr1-acoes{display:grid;gap:12px;margin-top:22px}
+.nr1-acoes li{display:flex;gap:12px;align-items:center}
+.nr1-acoes svg{width:22px;height:22px;color:var(--gold-text);flex:none}
+
+/* Galeria: 4 colunas x 3 linhas no desktop (8 fotos, sem buracos); 2 colunas no mobile */
+.nr1-gallery{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:220px;grid-auto-flow:dense;gap:12px;margin-top:40px}
+.nr1-gallery__item--big{grid-column:span 2;grid-row:span 2}
+.nr1-gallery__item--tall{grid-row:span 2}
+.nr1-gallery__link{display:block;height:100%;border-radius:var(--radius);overflow:hidden;background:var(--ink-3);cursor:zoom-in}
+.nr1-gallery img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
+@media (hover:hover){ .nr1-gallery__link:hover img{transform:scale(1.04)} }
+@media (max-width:860px){
+  .nr1-gallery{grid-template-columns:repeat(2,1fr);grid-auto-rows:170px;gap:10px}
+}
+@media (max-width:420px){ .nr1-gallery{grid-auto-rows:140px} }
+
+/* Lightbox (<dialog> nativo) */
+.lightbox{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:56px 72px;border:0;background:transparent;color:#fff;overflow:hidden}
+.lightbox::backdrop{background:rgba(10,10,10,.92)}
+.lightbox[open]{display:flex;align-items:center;justify-content:center}
+.lightbox__fig{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:100%;max-height:100%}
+.lightbox__img{display:block;max-width:100%;max-height:calc(100vh - 160px);max-height:calc(100dvh - 160px);width:auto;height:auto;border-radius:var(--radius);touch-action:pan-y}
+.lightbox__cap{font-size:.9rem;color:#D2D2D2;text-align:center}
+.lightbox__count{position:absolute;left:0;right:0;bottom:18px;text-align:center;font-size:.85rem;color:#BDBDBD}
+.lightbox__btn,.lightbox__close{position:absolute;display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:rgba(26,26,26,.85);border:1px solid rgba(229,190,85,.45);color:#fff;transition:background-color var(--dur-fast),color var(--dur-fast)}
+.lightbox__btn svg,.lightbox__close svg{width:22px;height:22px}
+.lightbox__prev{left:16px;top:50%;transform:translateY(-50%)}
+.lightbox__prev svg{transform:rotate(180deg)}
+.lightbox__next{right:16px;top:50%;transform:translateY(-50%)}
+.lightbox__close{right:16px;top:16px}
+@media (hover:hover){ .lightbox__btn:hover,.lightbox__close:hover{background:var(--gold);color:var(--ink)} }
+@media (max-width:560px){
+  .lightbox{padding:64px 12px 56px}
+  .lightbox__prev,.lightbox__next{top:auto;bottom:8px;transform:none}
+  .lightbox__count{bottom:22px}
+}
+html.lightbox-open body{overflow:hidden}

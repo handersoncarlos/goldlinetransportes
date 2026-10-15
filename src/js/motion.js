@@ -103,6 +103,12 @@ function confianca() {
 }
 
 // Premiações ------------------------------------------------------------------
+function nr1() {
+  gsap.fromTo('.nr1-gallery img', { clipPath: 'inset(0% 0% 100% 0%)' }, {
+    clipPath: 'inset(0% 0% 0% 0%)', duration: M.durLong, ease: M.easeReveal, stagger: 0.08, scrollTrigger: once('[data-nr1]', 'top 82%'),
+  });
+}
+
 function premios() {
   gsap.fromTo('.partners li', { opacity: 0, y: M.dist / 2 }, { opacity: 1, y: 0, duration: M.durShort + 0.1, ease: M.ease, stagger: M.stagger, scrollTrigger: once('.partners', 'top 90%') });
   gsap.fromTo('.award-photos img', { clipPath: 'inset(0% 0% 100% 0%)' }, {
@@ -198,6 +204,7 @@ export function initMotion() {
   segmentos();
   confianca();
   premios();
+  nr1();
   mapa();
   cotacao();
   faq();

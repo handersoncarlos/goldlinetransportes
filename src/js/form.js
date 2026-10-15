@@ -1,4 +1,4 @@
-import { FORMSPREE_ID, WHATSAPP_COMERCIAL, waLink } from './config.js';
+import { WEB3FORMS_ACCESS_KEY, WEB3FORMS_ENDPOINT, WHATSAPP_COMERCIAL, waLink } from './config.js';
 import { track, getUtm } from './tracking.js';
 
 const MIN_FILL_MS = 3000;
@@ -89,7 +89,7 @@ export function initForm() {
     if (first) { first.focus(); return; }
 
     // Anti-spam: honeypot e envio rápido demais
-    if (form.elements._gotcha.value) return;
+    if (form.elements.botcheck.value) return;
     if (Date.now() - loadedAt < MIN_FILL_MS) {
       showStatus('Aguarde alguns segundos e envie novamente.', { error: false });
       return;
@@ -101,16 +101,26 @@ export function initForm() {
     const d = data();
     setSending(true);
     try {
-      if (!FORMSPREE_ID) {
-        console.warn('[form] FORMSPREE_ID vazio em src/js/config.js: usando o fluxo de erro.');
-        throw new Error('FORMSPREE_ID vazio');
+      if (!WEB3FORMS_ACCESS_KEY) {
+        console.warn('[form] WEB3FORMS_ACCESS_KEY vazio em src/js/config.js: usando o fluxo de erro.');
+        throw new Error('WEB3FORMS_ACCESS_KEY vazio');
       }
-      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+      // Web3Forms: JSON com a access key, assunto, remetente e resposta para o e-mail do visitante,
+      // mais todos os campos do formulário e os ocultos (origem, UTMs, gclid, fbclid). O honeypot não vai.
+      const { botcheck, ...campos } = d;
+      const res = await fetch(WEB3FORMS_ENDPOINT, {
         method: 'POST',
-        body: new FormData(form),
-        headers: { Accept: 'application/json' },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: 'Pedido de cotação pelo site',
+          from_name: 'Site Goldline',
+          replyto: d.email,
+          ...campos,
+        }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json().catch(() => ({}));
+      if (json.success !== true) throw new Error(`Web3Forms: ${res.status}`);
 
       track('lead_form_submit', { modal: d.modal, tipo_carga: d.tipo_carga, origem_pagina: d.origem_pagina });
       try { sessionStorage.setItem(SUMMARY_KEY, JSON.stringify({ msg: buildWaMessage(d) })); } catch { /* sem armazenamento */ }

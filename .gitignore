@@ -1,9 +1,21 @@
+# Dependências e builds (o build é gerado pelo GitHub Actions)
 node_modules/
-dist/
-.DS_Store
-.env
-*.zip
+dist*/
+
+# Verificação local e pacotes
 _verificacao/
-dist-test/
+*.zip
+
+# Ambiente e segredos
+.env
+.env.*
+
+# Arquivos do sistema e editores
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+
+# Arquivos-fonte pesados de design
 _novas-imagens/*.psd
-dist-novosite/

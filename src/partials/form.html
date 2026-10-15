@@ -1,9 +1,10 @@
 <!--
   ENVIO DO FORMULÁRIO (src/js/form.js)
-  POST para https://formspree.io/f/FORMSPREE_ID (config.js). Só com resposta ok redireciona para obrigado.html.
-  Em falha (ou FORMSPREE_ID vazio), mostra erro com botão para enviar pelo WhatsApp.
+  POST em JSON para o Web3Forms (WEB3FORMS_ACCESS_KEY em config.js). Só com success: true redireciona para obrigado.html.
+  Em falha (ou chave vazia), mostra erro com botão para enviar pelo WhatsApp.
+  Sem JS, o formulário vai direto ao Web3Forms (action abaixo), que redireciona para obrigado.html.
 -->
-<form class="qform" id="qform" data-r="form" novalidate<!--if:FORMSPREE_ID--> action="https://formspree.io/f/{{FORMSPREE_ID}}" method="POST"<!--/if:FORMSPREE_ID-->>
+<form class="qform" id="qform" data-r="form" novalidate<!--if:WEB3FORMS_ACCESS_KEY--> action="{{WEB3FORMS_ENDPOINT}}" method="POST"<!--/if:WEB3FORMS_ACCESS_KEY-->>
   <h3>Solicitar cotação</h3>
   <p class="qform__hint">Campos com * são obrigatórios.</p>
   <div class="fgrid">
@@ -82,8 +83,8 @@
   <input type="hidden" name="utm_campaign">
   <input type="hidden" name="gclid">
   <input type="hidden" name="fbclid">
-  <input type="hidden" name="_subject" value="Pedido de cotação pelo site">
-  <div class="hp" aria-hidden="true"><label for="gotcha">Não preencha este campo</label><input type="text" id="gotcha" name="_gotcha" tabindex="-1" autocomplete="off"></div>
+  <!--if:WEB3FORMS_ACCESS_KEY--><noscript><input type="hidden" name="access_key" value="{{WEB3FORMS_ACCESS_KEY}}"><input type="hidden" name="subject" value="Pedido de cotação pelo site"><input type="hidden" name="from_name" value="Site Goldline"><input type="hidden" name="redirect" value="{{SITE_URL}}/obrigado.html"></noscript><!--/if:WEB3FORMS_ACCESS_KEY-->
+  <div class="hp" aria-hidden="true"><label for="gotcha">Não preencha este campo</label><input type="text" id="gotcha" name="botcheck" tabindex="-1" autocomplete="off"></div>
 
   <button type="submit" class="btn btn-gold qform__submit"><span class="qform__spinner" aria-hidden="true"></span><span class="qform__label">Enviar pedido de cotação</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
   <div class="qform__status" id="qformStatus" role="alert" hidden>

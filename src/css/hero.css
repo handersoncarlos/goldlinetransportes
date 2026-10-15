@@ -12,8 +12,9 @@
 .curve--2{right:-60px;bottom:-200px;width:700px;height:700px}
 .curve--2 circle{stroke-opacity:.18}
 
-.hero__title{max-width:820px;margin:.9rem 0 1.2rem;color:#fff}
+.hero__title{max-width:980px;margin:.9rem 0 1.2rem;color:#fff}
 .hero__title .g{color:var(--gold)}
+.hero__note{margin-top:14px;font-size:.8125rem;line-height:1.5;color:#B8B8B8;max-width:560px}
 .hero__sub{font-size:clamp(1.02rem,1.6vw,1.2rem);color:#D2D2D2;max-width:600px;margin-bottom:2rem}
 
 @media (max-width:560px){
@@ -29,6 +30,7 @@
   /* Subtítulo (elemento LCP no mobile): só desliza, legível desde o primeiro frame */
   .js .hero__sub{animation:hero-slide .6s var(--ease) both}
   .js .hero__ctas{animation-delay:.18s}
+  .js .hero__note{animation:hero-in .6s var(--ease) both;animation-delay:.26s}
 }
 @keyframes hero-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes hero-slide{from{transform:translateY(14px)}to{transform:none}}

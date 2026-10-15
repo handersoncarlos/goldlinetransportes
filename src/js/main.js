@@ -1,7 +1,7 @@
 import '../css/main.css';
 import { initConsent } from './consent.js';
 import { initForm } from './form.js';
-import { initHeader, initMenu, initFaq, initClients, initLazyMaps, initVideo, initWaFloat, initToTop, initCopy, initYear, initDeferredImages } from './ui.js';
+import { initHeader, initMenu, initFaq, initClients, initLazyMaps, initVideo, initWaFloat, initToTop, initCopy, initYear, initDeferredImages, initLightbox } from './ui.js';
 import { captureUtm, initClickTracking, track } from './tracking.js';
 
 const root = document.documentElement;
@@ -17,6 +17,7 @@ initFaq();
 initClients(reduced);
 initLazyMaps();
 initDeferredImages();
+initLightbox((indice) => track('galeria_nr1_open', { indice }));
 initVideo();
 initWaFloat();
 initToTop();

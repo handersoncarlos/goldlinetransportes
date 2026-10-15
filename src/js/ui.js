@@ -84,7 +84,7 @@ export function initClients(reduced) {
     const items = [...row.children];
     // Clones via HTML (e não cloneNode): assim o loading="lazy" vale desde a criação e as
     // imagens não são baixadas antes de a faixa chegar perto da tela
-    const copy = items.map((li) => li.outerHTML.replace('<li class="client"', '<li class="client" aria-hidden="true"').replace(/alt="[^"]*"/, 'alt=""')).join('');
+    const copy = items.map((li) => li.outerHTML.replace('<li ', '<li aria-hidden="true" ').replace(/alt="[^"]*"/, 'alt=""')).join('');
     row.insertAdjacentHTML('beforeend', copy);
     // ~80s por ciclo (metade da velocidade inicial), proporcional ao número de logos
     row.style.setProperty('--marquee-dur', `${Math.round(items.length * 5.2)}s`);
@@ -203,4 +203,70 @@ export function initDeferredImages() {
     entries.forEach((en) => { if (en.isIntersecting) { load(en.target); io.unobserve(en.target); } });
   }, { rootMargin: '400px 0px' });
   imgs.forEach((img) => io.observe(img));
+}
+
+// Lightbox da galeria NR-1 com <dialog> nativo (showModal prende o foco e fecha com Esc).
+// Setas do teclado e botões navegam; swipe no celular; clique fora fecha; o foco volta à foto ao fechar.
+export function initLightbox(onOpen) {
+  const gal = document.querySelector('[data-nr1]');
+  if (!gal || typeof HTMLDialogElement !== 'function') return;
+  const links = [...gal.querySelectorAll('a[data-lightbox]')];
+  if (!links.length) return;
+  const dlg = document.createElement('dialog');
+  dlg.className = 'lightbox';
+  dlg.setAttribute('aria-label', 'Galeria de fotos de bem-estar');
+  dlg.innerHTML = `
+    <figure class="lightbox__fig"><img class="lightbox__img" alt=""><figcaption class="lightbox__cap" hidden></figcaption></figure>
+    <p class="lightbox__count" aria-live="polite"></p>
+    <button type="button" class="lightbox__btn lightbox__prev" aria-label="Foto anterior"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+    <button type="button" class="lightbox__btn lightbox__next" aria-label="Próxima foto"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+    <button type="button" class="lightbox__close" aria-label="Fechar galeria" autofocus><svg aria-hidden="true"><use href="#i-close"/></svg></button>`;
+  document.body.appendChild(dlg);
+  const img = dlg.querySelector('.lightbox__img');
+  const cap = dlg.querySelector('.lightbox__cap');
+  const count = dlg.querySelector('.lightbox__count');
+  let index = 0, opener = null;
+
+  const show = (n) => {
+    index = (n + links.length) % links.length;
+    const a = links[index];
+    img.src = a.href;
+    img.alt = a.querySelector('img').alt;
+    cap.textContent = a.dataset.caption || '';
+    cap.hidden = !a.dataset.caption;
+    count.textContent = `Foto ${index + 1} de ${links.length}`;
+  };
+
+  links.forEach((a, n) => a.addEventListener('click', (e) => {
+    e.preventDefault();
+    opener = a;
+    show(n);
+    dlg.showModal();
+    document.documentElement.classList.add('lightbox-open');
+    window.__glLenis?.stop();
+    onOpen?.(n + 1);
+  }));
+  dlg.addEventListener('close', () => {
+    document.documentElement.classList.remove('lightbox-open');
+    window.__glLenis?.start();
+    opener?.focus();
+  });
+  dlg.querySelector('.lightbox__prev').addEventListener('click', () => show(index - 1));
+  dlg.querySelector('.lightbox__next').addEventListener('click', () => show(index + 1));
+  dlg.querySelector('.lightbox__close').addEventListener('click', () => dlg.close());
+  // Clique fora da foto e dos botões fecha
+  dlg.addEventListener('click', (e) => { if (!e.target.closest('.lightbox__img, .lightbox__btn, .lightbox__close, .lightbox__cap')) dlg.close(); });
+  dlg.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); show(index - 1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); show(index + 1); }
+  });
+  // Swipe horizontal
+  let x0 = null, y0 = null;
+  dlg.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  dlg.addEventListener('touchend', (e) => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) show(index + (dx < 0 ? 1 : -1));
+    x0 = y0 = null;
+  });
 }

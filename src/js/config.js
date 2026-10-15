@@ -1,16 +1,18 @@
 // Valores do cliente. Tudo que ainda depende de confirmação está marcado com TODO.
 // Depois de alterar este arquivo, rode `npm run build` e publique de novo a pasta dist/.
 
-// TODO 3: confirmar domínio final (afeta canonical, Open Graph, JSON-LD, sitemap e robots)
-export const SITE_URL = 'https://goldlinetransportes.com.br';
+// Domínio final do site (canonical, Open Graph, JSON-LD, sitemap, robots e redirecionamento www no .htaccess).
+// Os e-mails de contato continuam em @goldlinetransportes.com.br.
+export const SITE_URL = 'https://goldlinecargasaereas.com.br';
 
 // TODO 13: ID do Google Tag Manager (ex.: 'GTM-XXXXXXX'). Vazio = GTM não é carregado.
 export const GTM_ID = '';
 
-// TODO 14: ID do formulário no Formspree (ex.: 'xyzabcd'). O destinatário (comercial@goldlinetransportes.com.br)
-// é definido no painel do Formspree: ver README-PUBLICACAO.md.
-// Vazio = o formulário cai no fluxo de erro e oferece o envio pelo WhatsApp.
-export const FORMSPREE_ID = '';
+// Web3Forms: access key vinculada a comercial@goldlinetransportes.com.br. A chave é pública por definição
+// (vai no HTML), por isso fica aqui versionada. Vazio = o formulário cai no fluxo de erro com WhatsApp.
+// Limite do plano gratuito: 250 envios por mês. Não faça envios de teste com esta chave.
+export const WEB3FORMS_ACCESS_KEY = 'a2a8b2a4-dc13-492e-8739-44ce4af627c7';
+export const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
 
 export const WHATSAPP_COMERCIAL = '5585997010005';
 export const WHATSAPP_GUARULHOS = '5511910601099';

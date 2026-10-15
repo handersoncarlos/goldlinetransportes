@@ -1,5 +1,6 @@
 // Testes funcionais com Playwright (Chrome do sistema).
-// Uso: node scripts/verify-functional.mjs <url do build normal> <url do build de teste com FORMSPREE_ID e GTM_ID>
+// Uso: node scripts/verify-functional.mjs <url do build normal> <url do build de teste com GTM_ID>
+// O Web3Forms é SEMPRE interceptado (nenhum envio real): sem rota própria, a resposta simulada é de erro.
 import { chromium } from 'playwright-core';
 import { WA } from '../src/js/config.js';
 
@@ -12,6 +13,9 @@ const check = (name, ok, detail = '') => { results.push({ ok: !!ok, name, detail
 
 async function newPage(opts = {}) {
   const ctx = await browser.newContext({ viewport: { width: opts.width || 1366, height: 900 }, reducedMotion: opts.reduced ? 'reduce' : 'no-preference' });
+  // Bloqueio de segurança: nenhuma requisição real ao Web3Forms (limite de 250 envios/mês da chave)
+  ctx.web3 = [];
+  await ctx.route('https://api.web3forms.com/**', (r) => { ctx.web3.push(r.request()); r.fulfill({ status: 503, contentType: 'application/json', body: '{"success":false,"message":"simulado"}' }); });
   const page = await ctx.newPage();
   page.errors = [];
   page.on('pageerror', (e) => page.errors.push(e.message));
@@ -45,11 +49,11 @@ const VALID = { nome: 'Teste Silva', empresa: 'Empresa Teste', telefone: '859999
   await fill(page, VALID);
   check('Máscara do telefone (11 dígitos)', (await page.inputValue('#telefone')) === '(85) 99999-0000', await page.inputValue('#telefone'));
   await page.waitForTimeout(3100);
-  // FORMSPREE_ID vazio: fluxo de erro com WhatsApp
+  // Web3Forms com erro (simulado): fluxo de erro com WhatsApp
   await page.click('.qform__submit');
   await page.waitForSelector('#qformStatus:not([hidden])');
   const waHref = await page.getAttribute('#qformWa', 'href');
-  check('FORMSPREE_ID vazio cai no fluxo de erro com botão de WhatsApp', !(await page.isHidden('#qformWa')) && decodeURIComponent(waHref).includes('Nome: Teste Silva'), decodeURIComponent(waHref).slice(0, 80));
+  check('Erro do Web3Forms mostra o botão de WhatsApp com a mensagem montada', !(await page.isHidden('#qformWa')) && decodeURIComponent(waHref).includes('Nome: Teste Silva'), decodeURIComponent(waHref).slice(0, 80));
   check('Dados permanecem no formulário após erro', (await page.inputValue('#nome')) === 'Teste Silva');
   await ctx.close();
 }
@@ -58,7 +62,7 @@ const VALID = { nome: 'Teste Silva', empresa: 'Empresa Teste', telefone: '859999
 {
   const { ctx, page } = await newPage();
   let posts = 0;
-  await page.route('https://formspree.io/**', (r) => { posts++; r.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }); });
+  await page.route('https://api.web3forms.com/**', (r) => { posts++; r.fulfill({ status: 200, contentType: 'application/json', body: '{"success":true,"message":"Email sent successfully!"}' }); });
   await page.route('https://www.googletagmanager.com/**', (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
   await page.goto(`${TEST}?utm_source=google&utm_medium=cpc&utm_campaign=teste&gclid=abc123`);
   await page.click('[data-consent="denied"]');
@@ -87,13 +91,15 @@ const VALID = { nome: 'Teste Silva', empresa: 'Empresa Teste', telefone: '859999
   check('Card Farma pré-seleciona o tipo de carga', (await page.inputValue('#tipo')) === 'Farmacêutico / químico / perigoso');
   // Sucesso
   const [req] = await Promise.all([
-    page.waitForRequest('https://formspree.io/**'),
+    page.waitForRequest('https://api.web3forms.com/**'),
     page.click('.qform__submit'),
   ]);
   const body = req.postData() || '';
-  check('POST para Formspree com Accept JSON', req.method() === 'POST' && req.headers()['accept'] === 'application/json');
-  check('UTM e gclid enviados com o formulário', body.includes('google') && body.includes('cpc') && body.includes('abc123'));
-  check('Sem campos CNPJ e volumes', !body.includes('name="cnpj"') && !body.includes('name="volumes"'));
+  const json = JSON.parse(body || '{}');
+  check('POST JSON para api.web3forms.com/submit com Accept JSON', req.method() === 'POST' && req.url() === 'https://api.web3forms.com/submit' && req.headers()['accept'] === 'application/json' && req.headers()['content-type'] === 'application/json');
+  check('Web3Forms: access_key, subject, from_name e replyto', json.access_key === 'a2a8b2a4-dc13-492e-8739-44ce4af627c7' && json.subject === 'Pedido de cotação pelo site' && json.from_name === 'Site Goldline' && json.replyto === VALID.email, JSON.stringify({ s: json.subject, f: json.from_name, r: json.replyto }));
+  check('Campos do formulário, origem da página, UTM e gclid enviados', json.nome === VALID.nome && json.tipo_carga === 'Farmacêutico / químico / perigoso' && json.origem_pagina === 'card-farma' && json.utm_source === 'google' && json.utm_medium === 'cpc' && json.gclid === 'abc123' && 'fbclid' in json);
+  check('Honeypot não é enviado; sem campos CNPJ e volumes', !('botcheck' in json) && !('cnpj' in json) && !('volumes' in json));
   await page.waitForURL('**/obrigado.html');
   check('Sucesso redireciona para obrigado.html', page.url().endsWith('/obrigado.html'));
   const thanksWa = decodeURIComponent(await page.getAttribute('#thanksWa', 'href'));
@@ -103,7 +109,7 @@ const VALID = { nome: 'Teste Silva', empresa: 'Empresa Teste', telefone: '859999
 
   // Evento lead_form_submit (captura antes do redirecionamento)
   const b = await newPage();
-  await b.page.route('https://formspree.io/**', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }));
+  await b.page.route('https://api.web3forms.com/**', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"success":true}' }));
   await b.page.goto(TEST);
   await b.page.click('[data-consent="denied"]');
   await b.page.evaluate(() => { window.__dlCopy = []; const push = window.dataLayer.push.bind(window.dataLayer); window.dataLayer.push = (...a) => { window.__dlCopy.push(...a); try { sessionStorage.setItem('dlcopy', JSON.stringify(window.__dlCopy.filter((x) => x && x.event))); } catch {} return push(...a); }; });
@@ -120,7 +126,8 @@ const VALID = { nome: 'Teste Silva', empresa: 'Empresa Teste', telefone: '859999
 
   // Falha
   const f = await newPage();
-  await f.page.route('https://formspree.io/**', (r) => r.fulfill({ status: 500, body: 'erro' }));
+  // Resposta 200 mas com success:false também é erro
+  await f.page.route('https://api.web3forms.com/**', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"success":false,"message":"erro"}' }));
   await f.page.goto(TEST);
   await f.page.click('[data-consent="denied"]');
   await fill(f.page, VALID);
@@ -129,7 +136,7 @@ const VALID = { nome: 'Teste Silva', empresa: 'Empresa Teste', telefone: '859999
   await f.page.waitForTimeout(3100);
   await f.page.click('.qform__submit');
   await f.page.waitForSelector('#qformWa:not([hidden])');
-  check('Falha do Formspree mostra erro e WhatsApp, sem redirecionar', f.page.url().startsWith(TEST) && !f.page.url().includes('obrigado'));
+  check('Web3Forms com success:false mostra erro e WhatsApp, sem redirecionar', f.page.url().startsWith(TEST) && !f.page.url().includes('obrigado'));
   check('Botão volta ao normal após falha', (await f.page.textContent('.qform__label')) === 'Enviar pedido de cotação');
   const lead2 = (await dl(f.page)).find((e) => e.event === 'lead_form_submit');
   check('Sem lead_form_submit quando o envio falha', !lead2);
@@ -311,7 +318,7 @@ const VALID = { nome: 'Teste Silva', empresa: 'Empresa Teste', telefone: '859999
   await page.evaluate(() => document.getElementById('premios').scrollIntoView());
   await page.waitForFunction(() => [...document.querySelectorAll('.partners img')].every((i) => i.complete && i.naturalWidth > 0));
   await page.waitForTimeout(800);
-  check('Parceiros: 4 logos na ordem, 2 x 2, até 300px, cantos de 14px, proporção original', await page.evaluate(() => { const i = [...document.querySelectorAll('.partners img')]; const tops = new Set(i.map((x) => Math.round(x.getBoundingClientRect().top))); return i.map((x) => x.alt).join() === 'LATAM Cargo,GOLLOG,Azul Cargo Express,Mercado Livre' && tops.size === 2 && i.every((x) => { const r = x.getBoundingClientRect(); return r.width <= 300 && getComputedStyle(x).borderRadius === '14px' && Math.abs(r.width / r.height - x.naturalWidth / x.naturalHeight) < 0.03; }); }));
+  check('Parceiros: GOLLOG, Mercado Livre / LATAM Cargo, Azul Cargo, 2 x 2, até 300px, cantos de 14px, proporção original', await page.evaluate(() => { const i = [...document.querySelectorAll('.partners img')]; const tops = new Set(i.map((x) => Math.round(x.getBoundingClientRect().top))); return i.map((x) => x.alt).join() === 'GOLLOG,Mercado Livre,LATAM Cargo,Azul Cargo Express' && tops.size === 2 && i.every((x) => { const r = x.getBoundingClientRect(); return r.width <= 300 && getComputedStyle(x).borderRadius === '14px' && Math.abs(r.width / r.height - x.naturalWidth / x.naturalHeight) < 0.03; }); }));
   check('Rótulo "Parceiros"', (await page.textContent('.partners-label')).trim() === 'Parceiros');
   // Mapas: placeholder sem aceite, "Ver mapa" carrega só aquele card
   await page.click('[data-consent="denied"]');
@@ -381,6 +388,85 @@ const VALID = { nome: 'Teste Silva', empresa: 'Empresa Teste', telefone: '859999
     const sitemap = await (await page.request.get(BASE + 'sitemap.xml')).text();
     check('robots.txt sem bloqueio do obrigado; sitemap com Trabalhe Conosco', !robots.includes('obrigado') && sitemap.includes('trabalhe-conosco.html'));
   }
+  await ctx.close();
+}
+
+// Ajustes 03 ----------------------------------------------------------------------------------------
+{
+  // Movimento reduzido: o H1 não é dividido em linhas pelo SplitText, o texto fica íntegro para comparar
+  const { ctx, page } = await newPage({ width: 360, reduced: true });
+  await page.goto(BASE); await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(500);
+  const h = await page.evaluate(() => { const t = document.querySelector('.hero__title'); const lh = parseFloat(getComputedStyle(t).lineHeight); return { lines: Math.round(t.getBoundingClientRect().height / lh), txt: t.textContent.replace(/\s+/g, ' ').trim(), g: [...t.querySelectorAll('.g')].map((x) => x.textContent).join('|') }; });
+  check('H1 novo com no máximo 4 linhas em 360px', h.lines <= 4 && h.txt === 'Rodoviário expresso do Nordeste ao Sudeste em 3 dias e aéreo para todo o Brasil.', `${h.lines} linhas: ${h.txt}`);
+  check('H1: destaques dourados nos dois trechos', h.g.includes('do Nordeste ao Sudeste em 3 dias') && h.g.includes('todo o Brasil'), h.g);
+  check('Nota do prazo abaixo dos CTAs', (await page.textContent('.hero__note')).trim() === 'Prazo do expresso rodoviário a partir da origem e destino informados na cotação.');
+  await ctx.close();
+}
+{
+  const { ctx, page } = await newPage({ width: 1366 });
+  await page.goto(BASE);
+  await page.click('[data-consent="denied"]');
+  const removed = ['Globo', "Harry's", 'Dudalina', 'Unimed', 'Aramis', 'Taco'];
+  const alts = await page.$$eval('.client:not([aria-hidden]) img', (els) => els.map((e) => e.alt));
+  check('Clientes: 31 logos, sem os 6 removidos e com os 6 novos', alts.length === 31 && !alts.some((a) => removed.includes(a)) && ['Excelência Selects', 'Usibras', 'Grupo Fornecedora', 'Phoenix Global', 'Santana Textiles', 'Sellene'].every((a) => alts.includes(a)), alts.join(', '));
+  const rows = await page.$$eval('.clients__row', (rs) => rs.map((r) => [...r.querySelectorAll('.client:not([aria-hidden]) img')].map((i) => i.alt)));
+  const novos = ['Excelência Selects', 'Usibras', 'Grupo Fornecedora', 'Phoenix Global', 'Santana Textiles', 'Sellene'];
+  check('Logos novos nas duas faixas, sem dois novos lado a lado', rows.every((r) => r.some((a) => novos.includes(a))) && rows.every((r) => r.every((a, k) => !(novos.includes(a) && novos.includes(r[k + 1])))));
+  check('Premiações: sem as fotos 042 e 043; Meli Air presente', !(await page.$('img[src*="premio-042"], img[src*="premio-043"]')) && (await page.getAttribute('.award-photos__meli', 'alt')) === 'Equipe Goldline em evento Meli Air, do Mercado Livre');
+  // NR-1
+  await page.evaluate(() => document.getElementById('bem-estar').scrollIntoView()); await page.waitForTimeout(1500);
+  const sec = await page.evaluate(() => { const s = document.getElementById('bem-estar'); const prev = s.previousElementSibling; return { prev: prev && prev.id, eyebrow: s.querySelector('.eyebrow').textContent, h2: s.querySelector('h2').textContent, items: s.querySelectorAll('.nr1-gallery img').length, acoes: s.querySelectorAll('.nr1-acoes').length, bg: getComputedStyle(s).backgroundColor }; });
+  check('Seção NR-1 depois de Premiações, fundo alternado, 8 fotos, sem lista de ações vazia', sec.prev === 'premios' && sec.eyebrow === 'Pessoas e bem-estar' && sec.h2 === 'Cuidar de quem faz a Goldline acontecer' && sec.items === 8 && sec.acoes === 0 && sec.bg === 'rgb(246, 244, 239)', JSON.stringify(sec));
+  const holes = await page.evaluate(() => { const g = document.querySelector('.nr1-gallery').getBoundingClientRect(); const it = [...document.querySelectorAll('.nr1-gallery__item')].map((e) => e.getBoundingClientRect()); const area = it.reduce((a, r) => a + r.width * r.height, 0); return { cobertura: area / (g.width * g.height) }; });
+  check('Galeria desktop sem buracos (fotos cobrem o grid)', holes.cobertura > 0.9, JSON.stringify(holes));
+  // Lightbox
+  await page.click('.nr1-gallery a[data-lightbox="2"]');
+  await page.waitForTimeout(300);
+  const st1 = await page.evaluate(() => ({ open: document.querySelector('dialog.lightbox').open, count: document.querySelector('.lightbox__count').textContent, focus: document.activeElement.className }));
+  check('Lightbox abre na foto clicada com o foco dentro', st1.open && st1.count === 'Foto 3 de 8' && st1.focus.includes('lightbox__close'), JSON.stringify(st1));
+  await page.keyboard.press('ArrowRight');
+  check('Seta direita avança', (await page.textContent('.lightbox__count')) === 'Foto 4 de 8');
+  await page.keyboard.press('ArrowLeft'); await page.keyboard.press('ArrowLeft');
+  check('Seta esquerda volta', (await page.textContent('.lightbox__count')) === 'Foto 2 de 8');
+  for (let k = 0; k < 6; k++) await page.keyboard.press('Tab');
+  check('Tab mantém o foco dentro do lightbox', await page.evaluate(() => !!document.activeElement.closest('dialog.lightbox')));
+  await page.keyboard.press('Escape'); await page.waitForTimeout(200);
+  check('Esc fecha e devolve o foco à foto', await page.evaluate(() => !document.querySelector('dialog.lightbox').open && document.activeElement.matches('a[data-lightbox="2"]')));
+  await page.click('.nr1-gallery a[data-lightbox="0"]'); await page.waitForTimeout(200);
+  await page.mouse.click(30, 120); await page.waitForTimeout(200);
+  check('Clique fora fecha o lightbox', !(await page.evaluate(() => document.querySelector('dialog.lightbox').open)));
+  const ev = (await dl(page)).filter((e) => e.event === 'galeria_nr1_open').map((e) => e.indice);
+  check('galeria_nr1_open com o índice da foto', ev.join() === '3,1', ev.join());
+  // Nenhuma pendência visível
+  for (const p of ['', 'politica-de-privacidade.html', 'trabalhe-conosco.html', 'obrigado.html']) {
+    await page.goto(BASE + p);
+    // Texto do documento (sem scripts, estilos e noscript), sem a caixa alta do CSS ("todo o Brasil" não é "TODO")
+    const txt = await page.evaluate(() => { const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: (n) => n.parentElement.closest('script,style,noscript') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT }); let t = ''; while (w.nextNode()) t += w.currentNode.data + ' '; return t; });
+    const hit = txt.match(/TODO|PENDENTE|A CONFIRMAR|XXX|\[/);
+    check(`${p || 'home'}: nenhum texto de pendência visível`, !hit, hit && txt.slice(Math.max(0, hit.index - 30), hit.index + 30));
+  }
+  check('Nenhum envio real ao Web3Forms nos testes desta página', ctx.web3.length === 0);
+  await ctx.close();
+}
+{
+  // Swipe no lightbox (celular)
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  await ctx.route('https://api.web3forms.com/**', (r) => r.fulfill({ status: 503, body: '{}' }));
+  const page = await ctx.newPage();
+  await page.goto(BASE);
+  await page.evaluate(() => document.getElementById('bem-estar').scrollIntoView()); await page.waitForTimeout(1200);
+  await page.tap('.nr1-gallery a[data-lightbox="0"]'); await page.waitForTimeout(300);
+  const swipe = (dx) => page.evaluate((dx) => {
+    const d = document.querySelector('dialog.lightbox');
+    const t = (x) => new Touch({ identifier: 1, target: d, clientX: x, clientY: 400 });
+    d.dispatchEvent(new TouchEvent('touchstart', { touches: [t(200)], changedTouches: [t(200)], bubbles: true }));
+    d.dispatchEvent(new TouchEvent('touchend', { touches: [], changedTouches: [t(200 + dx)], bubbles: true }));
+  }, dx);
+  await swipe(-120);
+  const a = await page.textContent('.lightbox__count');
+  await swipe(120);
+  const b = await page.textContent('.lightbox__count');
+  check('Swipe no celular navega entre as fotos', a === 'Foto 2 de 8' && b === 'Foto 1 de 8', `${a} / ${b}`);
   await ctx.close();
 }
 

@@ -59,6 +59,14 @@
       1280
     ]
   },
+  "premiacao-meli-air": {
+    "w": 720,
+    "h": 747,
+    "widths": [
+      480,
+      720
+    ]
+  },
   "parceria": {
     "w": 1600,
     "h": 1067,
@@ -68,17 +76,75 @@
       1600
     ]
   },
+  "nr1-01": {
+    "w": 1280,
+    "h": 960,
+    "widths": [
+      480,
+      960,
+      1280
+    ]
+  },
+  "nr1-02": {
+    "w": 1536,
+    "h": 864,
+    "widths": [
+      480,
+      960,
+      1280
+    ]
+  },
+  "nr1-03": {
+    "w": 960,
+    "h": 1280,
+    "widths": [
+      480,
+      960
+    ]
+  },
+  "nr1-04": {
+    "w": 720,
+    "h": 1280,
+    "widths": [
+      480,
+      720
+    ]
+  },
+  "nr1-05": {
+    "w": 960,
+    "h": 1280,
+    "widths": [
+      480,
+      960
+    ]
+  },
+  "nr1-06": {
+    "w": 960,
+    "h": 1280,
+    "widths": [
+      480,
+      960
+    ]
+  },
+  "nr1-07": {
+    "w": 925,
+    "h": 900,
+    "widths": [
+      480,
+      925
+    ]
+  },
+  "nr1-08": {
+    "w": 720,
+    "h": 1280,
+    "widths": [
+      480,
+      720
+    ]
+  },
   "premio-040.webp": {
     "w": 288,
     "h": 384
-  },
-  "premio-042.webp": {
-    "w": 384,
-    "h": 480
-  },
-  "premio-043.webp": {
-    "w": 480,
-    "h": 320
   },
   "premio-045.webp": {
     "w": 512,
@@ -99,10 +165,6 @@
   "logo-mercadolivre": {
     "w": 300,
     "h": 122
-  },
-  "clientes/aramis": {
-    "w": 95,
-    "h": 20
   },
   "clientes/avenida": {
     "w": 87,
@@ -128,17 +190,9 @@
     "w": 92,
     "h": 56
   },
-  "clientes/dudalina": {
-    "w": 92,
-    "h": 55
-  },
   "clientes/eskala": {
     "w": 84,
     "h": 27
-  },
-  "clientes/globo": {
-    "w": 58,
-    "h": 56
   },
   "clientes/grazziotin": {
     "w": 81,
@@ -147,10 +201,6 @@
   "clientes/hapvida": {
     "w": 91,
     "h": 56
-  },
-  "clientes/harrys": {
-    "w": 65,
-    "h": 52
   },
   "clientes/hering": {
     "w": 120,
@@ -172,6 +222,30 @@
     "w": 120,
     "h": 33
   },
+  "clientes/fornecedora": {
+    "w": 120,
+    "h": 36
+  },
+  "clientes/phoenix": {
+    "w": 81,
+    "h": 56
+  },
+  "clientes/santana": {
+    "w": 51,
+    "h": 56
+  },
+  "clientes/selects": {
+    "w": 120,
+    "h": 52
+  },
+  "clientes/sellen": {
+    "w": 73,
+    "h": 56
+  },
+  "clientes/usibras": {
+    "w": 120,
+    "h": 31
+  },
   "clientes/pernambucanas": {
     "w": 120,
     "h": 43
@@ -188,10 +262,6 @@
     "w": 114,
     "h": 24
   },
-  "clientes/taco": {
-    "w": 103,
-    "h": 43
-  },
   "clientes/telefonica": {
     "w": 120,
     "h": 40
@@ -207,10 +277,6 @@
   "clientes/toyota": {
     "w": 96,
     "h": 22
-  },
-  "clientes/unimed": {
-    "w": 77,
-    "h": 56
   },
   "clientes/via-veneto": {
     "w": 77,

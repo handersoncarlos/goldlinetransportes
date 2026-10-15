@@ -1,86 +1,68 @@
 # Goldline Transportes v2: publicação e manutenção
 
-Site estático (HTML, CSS e JS) gerado com Vite. O pacote final é `goldline-v2-hostinger.zip`, com o **conteúdo** da pasta `dist/` na raiz (inclui o `.htaccess`).
+Site estático (HTML, CSS e JS) gerado com Vite e publicado na **raiz** de `https://goldlinecargasaereas.com.br/`.
 
-## 0. Homologação em /novosite
+- Código: repositório privado `https://github.com/handersoncarlos/goldlinetransportes`.
+- `npm run build` gera `dist/` (raiz do domínio, padrão). Esse é o conteúdo publicado.
+- A cada push na branch `main`, o GitHub Actions roda o build e publica o conteúdo de `dist/` na branch `deploy`, que a Hostinger implanta em `public_html` (seção 1).
 
-Antes da publicação final, o site fica em `https://goldlinetransportes.com.br/novosite/` para o cliente aprovar, sem mexer no site atual da raiz.
+Os e-mails de contato continuam em `@goldlinetransportes.com.br`.
 
-O mesmo código gera os dois cenários. A base vem da variável `SITE_BASE`, lida em `scripts/site-env.mjs`:
+## 0. Fluxo de trabalho com as branches
 
-| Comando | Base | Pasta gerada | Pacote |
-|---|---|---|---|
-| `npm run build:novosite` | `/novosite/` | `dist-novosite/` | `npm run zip:novosite` gera `goldline-novosite.zip` |
-| `npm run build` | `/` | `dist/` | `npm run zip` gera `goldline-v2-hostinger.zip` |
+| Branch | Uso |
+|---|---|
+| `dev` | Trabalho do dia a dia. Alterações são feitas e revisadas no localhost (seção 6). |
+| `main` | Versão aprovada. Todo push ou merge aqui publica o site automaticamente. |
+| `deploy` | Gerada pelo GitHub Actions. Contém só os arquivos do site (o conteúdo de `dist/`, com `.htaccess`). Não edite à mão. |
 
-O build de homologação é diferente do final em 5 pontos:
-- Todos os links e arquivos usam o prefixo `/novosite/`.
-- Todas as páginas têm `<meta name="robots" content="noindex, nofollow">`, e o `.htaccess` envia `X-Robots-Tag: noindex, nofollow`. Nada disso vai para o build final.
-- Não há `robots.txt` nem `sitemap.xml` (o `robots.txt` só vale na raiz do domínio).
-- O `.htaccess` só força HTTPS dentro de `/novosite/` (com `RewriteBase /novosite/` e 404 em `/novosite/404.html`) e não tem regras de www ou de domínio, para não afetar o site da raiz.
-- Com `GTM_ID` preenchido, o `dataLayer` recebe `site_ambiente: 'homologacao'` antes do GTM (no final, `'producao'`). No GTM, crie uma variável da camada de dados `site_ambiente` e use a condição `site_ambiente igual a producao` nos acionadores de conversão, para os testes não contarem como conversão real.
-
-Canonical, `og:url` e `og:image` apontam sempre para o endereço final na raiz.
-
-Passo a passo:
-
-1. Na Hostinger, abra o Gerenciador de Arquivos, entre em `public_html` e crie a pasta `novosite`.
-2. Envie `goldline-novosite.zip` para dentro de `novosite` e extraia ali. O `index.html` precisa ficar em `public_html/novosite/index.html` (o zip já tem os arquivos na raiz, sem subpasta). Ative "Mostrar arquivos ocultos" e confira se o `.htaccess` está em `public_html/novosite/`.
-3. Confirme que o SSL do domínio está ativo e acesse `https://goldlinetransportes.com.br/novosite/`.
-4. Opcional: proteja a pasta com senha em Avançado > Proteção de diretórios por senha, para só o cliente ver.
-5. Para a publicação final: rode `npm run build` e `npm run zip`, suba o conteúdo de `dist/` (ou o `goldline-v2-hostinger.zip`) na raiz seguindo a seção 1 e apague a pasta `novosite`.
-
-Formspree: o fluxo é o mesmo nos dois cenários (o redirecionamento vai para `/novosite/obrigado.html` na homologação e para `/obrigado.html` no final). Se o formulário tiver restrição de domínio (Settings > Restrict to domain), libere `goldlinetransportes.com.br`.
-
-Para conferir localmente:
+Para publicar uma alteração aprovada:
 
 ```bash
-npm run build:novosite
+git checkout main
 ```
 
 ```bash
-npm run preview:novosite
+git merge dev
 ```
-
-O site abre em `http://localhost:4173/novosite/`, com os mesmos cabeçalhos do `.htaccess`. Para desenvolvimento com recarga automática na mesma base:
 
 ```bash
-npm run dev:novosite
+git push origin main
 ```
 
-## 1. Subir na Hostinger
+Se o build falhar no GitHub Actions, nada é publicado e o site continua na versão anterior.
 
-1. **Ative o SSL antes de tudo.** hPanel > Websites > Gerenciar > Segurança > SSL. Espere o status "Ativo". O `.htaccess` força HTTPS: sem SSL o site entra em loop.
-2. hPanel > Arquivos > **Gerenciador de Arquivos** > abra `public_html`.
-3. Faça backup do conteúdo atual (selecionar tudo > Compactar > baixar) e apague os arquivos antigos.
-4. Clique em **Enviar** e envie `goldline-v2-hostinger.zip`.
-5. Clique com o botão direito no zip > **Extrair** > destino `public_html` (não crie subpasta). Apague o zip depois.
-6. Confira se o `.htaccess` está em `public_html` (no Gerenciador, ative "Mostrar arquivos ocultos").
-7. Teste: `https://goldlinetransportes.com.br`, `https://www.goldlinetransportes.com.br` (deve redirecionar para sem www), `/politica-de-privacidade.html`, uma URL inexistente (página 404) e o envio do formulário.
+## 1. Publicação via GitHub na Hostinger
 
-## 2. Trocar valores e gerar de novo
+**Antes de tudo: faça backup completo da pasta do site atual de `goldlinecargasaereas.com.br` na Hostinger.** A publicação via Git sobrescreve a pasta de destino. No hPanel: Arquivos > Gerenciador de Arquivos > `public_html` > selecionar tudo > Compactar > baixar o zip. Se houver e-mails ou outros serviços configurados no domínio, eles não são afetados (ficam no DNS), mas confira se não há outros arquivos importantes nessa pasta.
 
-Tudo que o cliente ainda vai confirmar está em **`src/js/config.js`**, com comentário `TODO`:
+1. Confirme que o SSL do domínio está ativo (hPanel > Segurança > SSL). O `.htaccess` força HTTPS.
+2. No hPanel do domínio `goldlinecargasaereas.com.br`, abra **Avançado > GIT**.
+3. O repositório é privado: a Hostinger mostra uma **chave SSH**. Copie essa chave.
+4. No GitHub, abra o repositório > **Settings > Deploy keys > Add deploy key**. Cole a chave, dê um nome (ex.: "Hostinger") e deixe **desmarcado** "Allow write access" (somente leitura).
+5. De volta à Hostinger, preencha:
+   - Repositório (formato SSH): `git@github.com:handersoncarlos/goldlinetransportes.git`
+   - Branch: `deploy`
+   - Diretório: `public_html` (ou o diretório do domínio, se a Hostinger indicar outro). Se o campo for relativo a `public_html`, deixe vazio.
+6. Clique em **Criar** e depois em **Implantar** para a primeira publicação. Confira o site e o `.htaccess` em `public_html` (Gerenciador de Arquivos com "Mostrar arquivos ocultos").
+7. Ative a **implantação automática**: a Hostinger mostra uma URL de webhook. No GitHub: Settings > Webhooks > Add webhook, cole a URL em "Payload URL", tipo `application/json`, evento "Just the push event". Faça um push de teste na `main` e confira se a Hostinger implantou (o histórico aparece na tela do GIT).
+8. Teste: `https://goldlinecargasaereas.com.br`, `https://www.goldlinecargasaereas.com.br` (deve redirecionar para sem www), `/politica-de-privacidade.html`, `/trabalhe-conosco.html` e uma URL inexistente (página 404).
 
-| Constante | O que é | Efeito quando vazio |
-|---|---|---|
-| `SITE_URL` | Domínio final (TODO 3) | Usado em canonical, Open Graph, JSON-LD, sitemap e robots |
-| `GTM_ID` | ID do Google Tag Manager, ex.: `GTM-ABC1234` (TODO 13) | GTM não é carregado |
-| `FORMSPREE_ID` | ID do formulário no Formspree (TODO 14) | Formulário mostra erro e oferece envio pelo WhatsApp |
-| `AREA_CLIENTE_URL` | Link do sistema de rastreamento (hoje `https://goldline.brudam.com.br/site/`) | Link do menu e botão do card "Sistema de gestão" não aparecem |
-| `FACEBOOK_URL` | Página do Facebook | Ícone não aparece no rodapé |
-| `INSTAGRAM_URL` | Perfil do Instagram | |
-| `EMAIL_RH` | E-mail do RH usado na página Trabalhe Conosco | |
-| `YOUTUBE_ID` | ID do vídeo institucional (TODO 6) | Bloco de vídeo não aparece na seção Sobre |
-| `RAZAO_SOCIAL`, `CNPJ` | Dados do rodapé e da política (TODO 2) | |
-| `STATS` | Números da faixa dourada (TODO 1) | |
-| `WA` | Números e mensagens de cada botão de WhatsApp | |
-
-Depois de editar:
+**Como voltar a uma versão anterior:** reverta o commit na `main` e envie. O Actions publica de novo a versão anterior na `deploy` e a Hostinger implanta.
 
 ```bash
-npm install
+git revert <id-do-commit>
 ```
+
+```bash
+git push origin main
+```
+
+Não guarde senhas, tokens ou chaves no repositório. A access key do Web3Forms é pública por definição (vai no HTML) e por isso fica no `config.js`.
+
+## 2. Publicação manual (alternativa sem Git)
+
+Se preferir subir os arquivos à mão:
 
 ```bash
 npm run build
@@ -90,87 +72,92 @@ npm run build
 npm run zip
 ```
 
-Para a homologação, use `npm run build:novosite` e `npm run zip:novosite` (seção 0). E repita a seção 1 com o novo `goldline-v2-hostinger.zip`.
+No Gerenciador de Arquivos, envie `goldline-v2-hostinger.zip` para `public_html`, extraia ali (sem subpasta) e apague o zip.
+
+## 3. Trocar valores e gerar de novo
+
+Tudo que o cliente ainda vai confirmar está em **`src/js/config.js`**:
+
+| Constante | O que é | Efeito quando vazio |
+|---|---|---|
+| `SITE_URL` | Domínio final (`https://goldlinecargasaereas.com.br`) | Usado em canonical, Open Graph, JSON-LD, sitemap, robots e no redirecionamento www do `.htaccess` |
+| `GTM_ID` | ID do Google Tag Manager, ex.: `GTM-ABC1234` (TODO 13) | GTM não é carregado |
+| `WEB3FORMS_ACCESS_KEY` | Access key do Web3Forms (seção 3.1) | Formulário mostra erro e oferece envio pelo WhatsApp |
+| `AREA_CLIENTE_URL` | Link do sistema de rastreamento | Link do menu e botão do card "Sistema de gestão" não aparecem |
+| `FACEBOOK_URL`, `INSTAGRAM_URL` | Redes sociais (rodapé e JSON-LD) | Ícone não aparece |
+| `EMAIL_RH` | E-mail do RH na página Trabalhe Conosco | |
+| `YOUTUBE_ID` | ID do vídeo institucional (TODO 6) | Bloco de vídeo não aparece na seção Sobre |
+| `RAZAO_SOCIAL`, `CNPJ` | Dados do rodapé e da política (TODO 2) | |
+| `STATS` | Números da faixa dourada (TODO 1) | |
+| `WA` | Números e mensagens de cada botão de WhatsApp | |
+
+Depois de editar, revise no localhost (seção 6) e envie para a `main`.
 
 Outros pontos de edição:
 
-- Textos das páginas: `index.html`, `politica-de-privacidade.html`, `obrigado.html` e `src/partials/` (cabeçalho, rodapé, formulário).
+- Textos das páginas: `index.html`, `politica-de-privacidade.html`, `obrigado.html`, `trabalhe-conosco.html` e `src/partials/` (cabeçalho, rodapé, formulário).
 - Perguntas do FAQ (geram o HTML e o JSON-LD `FAQPage`): `src/data/faq.js`. A 9ª pergunta (seguro de carga) já tem o lugar comentado.
-- Política de privacidade: encarregado de dados e data de atualização estão marcados como `[PENDENTE]` em `politica-de-privacidade.html` (TODO 15).
-- Registros RNTRC, AFE ANVISA e CTF IBAMA: comentários `TODO 7` em `index.html`, seção Certificações.
-- Imagens: as fotos novas ficam em `_novas-imagens/` (hero, solucoes-aereo, solucoes-rodoviario, solucoes-farma, vantagens, sobre, premiacao-nova, logos de parceiros; aceita .jpg, .png ou .webp). Troque o arquivo mantendo o nome e rode `npm run images`.
+- Seção NR-1 (Pessoas e bem-estar): a lista de ações está pronta em comentário no `index.html` e só deve ser publicada com itens confirmados. Os `alt` das 8 fotos estão provisórios (TODO 21).
+- Imagens: as fotos novas ficam em `_novas-imagens/` (hero, soluções, vantagens, sobre, premiações, logos de parceiros, `clientes/` e `nr1/`). Troque o arquivo mantendo o nome e rode `npm run images`.
 - Mapas do Google: com aceite de cookies carregam sozinhos; sem aceite aparecem os botões "Ver mapa" e "Abrir no Google Maps".
-- Mapa do Brasil: gerado da malha oficial do IBGE por `npm run map` (não editar `src/data/brasil.js` à mão).
+- Mapa do Brasil: gerado da malha oficial do IBGE por `npm run map`.
 
-## 2.1 Formspree (receber as cotações por e-mail)
+### 3.1 Web3Forms: onde trocar a access key
 
-O destinatário do e-mail é definido no painel do Formspree, não no código.
+O formulário de cotação envia os dados em JSON para `https://api.web3forms.com/submit`. O destinatário é o e-mail vinculado à access key no painel do Web3Forms (hoje `comercial@goldlinetransportes.com.br`).
 
-1. Crie a conta em https://formspree.io usando `comercial@goldlinetransportes.com.br` (ou adicione esse endereço como e-mail vinculado em Account > Linked Emails).
-2. Abra a caixa de entrada desse e-mail e clique no link de verificação enviado pelo Formspree. Sem essa confirmação os envios não são entregues.
-3. Em Forms > New Form, crie o formulário "Cotação site" e escolha `comercial@goldlinetransportes.com.br` como destinatário.
-4. Copie o ID do formulário: é o trecho final do endpoint `https://formspree.io/f/XXXXXXXX`.
-5. Cole o ID em `FORMSPREE_ID` no `src/js/config.js`, rode `npm run build` e `npm run zip` e publique de novo.
-6. Faça um envio de teste pelo site e confira o e-mail. O assunto chega como "Pedido de cotação pelo site" (campo oculto `_subject`) e o anti-spam usa o campo `_gotcha`.
+- Para trocar a chave: altere `WEB3FORMS_ACCESS_KEY` em `src/js/config.js` e publique (push na `main`).
+- Campos enviados: `access_key`, `subject` ("Pedido de cotação pelo site"), `from_name` ("Site Goldline"), `replyto` (e-mail do visitante), todos os campos do formulário e os ocultos (`origem_pagina`, UTMs, `gclid`, `fbclid`).
+- Antispam: campo honeypot próprio e bloqueio de envio em menos de 3 segundos.
+- O plano gratuito permite 250 envios por mês. Evite testes repetidos com a chave real.
+- Se o envio falhar, o visitante vê uma mensagem com o botão "Enviar pelo WhatsApp", e os dados continuam no formulário.
 
-## 3. Eventos para configurar no GTM
+## 4. Eventos para configurar no GTM
 
-O código só envia eventos para o `dataLayer`. Nenhuma tag (GA4, Meta Pixel, Google Ads) está no código: tudo é configurado no GTM.
+O código só envia eventos para o `dataLayer`. Nenhuma tag (GA4, Meta Pixel, Google Ads) está no código: tudo é configurado no GTM. Antes do GTM, o `dataLayer` recebe `site_ambiente: 'producao'` (ou `'homologacao'` no build de subdiretório).
 
 | Evento (`event`) | Quando dispara | Parâmetros |
 |---|---|---|
-| `lead_form_submit` | Formspree confirmou o envio do formulário (antes de ir para `obrigado.html`) | `modal`, `tipo_carga`, `origem_pagina` |
+| `lead_form_submit` | Web3Forms confirmou o envio (`success: true`), antes de ir para `obrigado.html` | `modal`, `tipo_carga`, `origem_pagina` |
 | `whatsapp_click` | Clique em qualquer link `wa.me` | `origem` (hero, card-aereo, card-rodoviario, card-farma, unidade-fortaleza, unidade-guarulhos, flutuante, cta-final, cotacao, rodape, rodape_fortaleza, rodape_guarulhos, formulario-erro, obrigado) |
-| `phone_click` | Clique em telefone (`tel:`) | `unidade` (fortaleza, guarulhos); `origem` nos links do rodapé (rodape_fortaleza, rodape_guarulhos) |
+| `phone_click` | Clique em telefone (`tel:`) | `unidade` (fortaleza, guarulhos); `origem` nos links do rodapé |
 | `email_click` | Clique em e-mail (`mailto:`) | `email` |
 | `cta_cotacao_click` | Clique em botão que leva ao formulário | `origem` (header, hero, solucoes, card-aereo, card-rodoviario, card-farma, cta-final, rodape) |
 | `area_cliente_click` | Clique na Área do Cliente | `origem` (menu, sistema_gestao) |
-| `curriculo_email_click` | Trabalhe Conosco: clique em "Enviar currículo por e-mail" ou "Copiar e-mail" | `acao` (mailto, copiar) |
+| `curriculo_email_click` | Trabalhe Conosco: "Enviar currículo por e-mail" ou "Copiar e-mail" | `acao` (mailto, copiar) |
+| `galeria_nr1_open` | Abertura de uma foto da galeria NR-1 | `indice` (1 a 8) |
 
 Sugestão de configuração no GTM:
 
-1. Variáveis da camada de dados para `modal`, `tipo_carga`, `origem_pagina`, `origem`, `unidade`, `email`.
-2. Acionadores do tipo "Evento personalizado" com os nomes acima.
+1. Variáveis da camada de dados para `modal`, `tipo_carga`, `origem_pagina`, `origem`, `unidade`, `email`, `indice` e `site_ambiente`.
+2. Acionadores do tipo "Evento personalizado" com os nomes acima. Nos acionadores de conversão, adicione a condição `site_ambiente igual a producao`.
 3. GA4: tag de configuração em "All Pages" + tags de evento com os mesmos nomes. Marque `lead_form_submit` e `whatsapp_click` como eventos-chave.
 4. Google Ads: conversão em `lead_form_submit` (ou visualização de página de `/obrigado.html`).
 5. Meta Pixel: `PageView` em todas as páginas; `Lead` em `lead_form_submit`; `Contact` em `whatsapp_click` e `phone_click`.
 
-**Consentimento (LGPD):** antes do GTM o site define o Consent Mode v2 com tudo negado. O GTM **só é carregado depois que a pessoa clica em Aceitar** (ou se ela já aceitou nos últimos 6 meses). Quem recusa não carrega nenhum script de terceiros. O link "Preferências de cookies" no rodapé reabre o banner.
+**Consentimento (LGPD):** antes do GTM o site define o Consent Mode v2 com tudo negado. O GTM **só é carregado depois que a pessoa clica em Aceitar** (ou se ela já aceitou nos últimos 6 meses). O link "Preferências de cookies" no rodapé reabre o banner.
 
-**CSP:** o `.htaccess` libera só os domínios de GTM, GA4, Meta, Google Ads, Formspree, Google Maps e YouTube nocookie. Se você adicionar no GTM uma ferramenta de outro domínio (Hotjar, LinkedIn, Clarity etc.), inclua o domínio em `scripts/postbuild.mjs` e gere de novo. Tags do tipo "HTML personalizado" com script inline também precisam de ajuste na CSP.
-
-## 4. Redirecionar `goldlinecargasaereas.com.br` mantendo o e-mail
-
-O redirecionamento é só do **site** (HTTP). O e-mail depende dos registros **MX, SPF, DKIM e DMARC** no DNS, que não devem ser alterados.
-
-Se o domínio antigo estiver na Hostinger:
-
-1. hPanel > domínio antigo > Arquivos > `public_html`: troque o conteúdo por um `.htaccess` com:
-
-```apache
-RewriteEngine On
-RewriteCond %{HTTP_HOST} ^(www\.)?goldlinecargasaereas\.com\.br$ [NC]
-RewriteRule ^(.*)$ https://goldlinetransportes.com.br/$1 [R=301,L]
-```
-
-2. Mantenha o SSL ativo no domínio antigo (sem ele o redirecionamento de `https://` falha).
-3. **Não** mude os nameservers nem apague registros MX/TXT do domínio antigo. Antes de qualquer mudança de DNS, exporte a zona (hPanel > Domínios > DNS) como backup.
-4. Teste o e-mail (envio e recebimento) logo depois.
-
-Se o domínio antigo estiver em outro provedor, use o redirecionamento 301 do painel desse provedor (redirecionamento "permanente", com caminho preservado), sem tocar na zona de e-mail.
+**CSP:** o `.htaccess` libera só os domínios de GTM, GA4, Meta, Google Ads, Web3Forms (`api.web3forms.com`), Google Maps e YouTube nocookie. Se você adicionar no GTM uma ferramenta de outro domínio (Hotjar, LinkedIn, Clarity etc.), inclua o domínio em `scripts/postbuild.mjs`. Tags do tipo "HTML personalizado" com script inline também precisam de ajuste na CSP.
 
 ## 5. Depois de publicar (fora do código)
 
-- DNS: domínio apontando para a Hostinger e SSL ativo.
-- GTM: criar o contêiner, colocar o ID em `config.js`, configurar as tags (seção 3) e publicar.
-- Formspree: criar o formulário, apontar para o e-mail comercial, colocar o ID em `config.js`. No Formspree, ative o filtro de spam e confira se o campo `_gotcha` é reconhecido.
-- Google Search Console: adicionar a propriedade, enviar `https://goldlinetransportes.com.br/sitemap.xml` (só existe no build final) e usar "Mudança de endereço" a partir do domínio antigo.
+- GTM: criar o contêiner, colocar o ID em `config.js`, configurar as tags (seção 4) e publicar.
+- Web3Forms: fazer um envio real de teste pelo site publicado e conferir a caixa `comercial@goldlinetransportes.com.br` (inclusive o spam na primeira vez).
+- Google Search Console: adicionar a propriedade `goldlinecargasaereas.com.br` e enviar `https://goldlinecargasaereas.com.br/sitemap.xml`.
 - Google Business Profile: atualizar o site das duas unidades.
 
 ## 6. Desenvolvimento e verificação
 
 ```bash
+npm install
+```
+
+```bash
 npm run dev
+```
+
+```bash
+npm run build
 ```
 
 ```bash
@@ -189,6 +176,20 @@ npm run verify:shots -- --sections
 npm run verify:func
 ```
 
-`verify:shots` gera capturas em `_verificacao/` (360 a 1920 px; use `--reduced` para movimento reduzido e `--nojs` para JavaScript desativado). `verify:func` testa formulário, WhatsApp, eventos, consentimento, menu, FAQ e SEO. Para os testes de envio com sucesso e GTM, ele espera em `http://localhost:4174` um build com `FORMSPREE_ID` e `GTM_ID` de teste (as requisições são interceptadas e não saem da máquina).
+`verify:shots` gera capturas em `_verificacao/` (360 a 1920 px; use `--reduced` para movimento reduzido e `--nojs` para JavaScript desativado). `verify:func` testa formulário, WhatsApp, eventos, consentimento, menu, FAQ, galeria e SEO. As requisições ao Web3Forms são sempre interceptadas nos testes (nenhum envio real). Para o teste do GTM, ele espera em `http://localhost:4174` um build com um `GTM_ID` de teste.
 
 Os testes usam o Google Chrome instalado em `/Applications`.
+
+## 7. Homologação em subdiretório (opcional, fora do padrão)
+
+O projeto ainda gera uma versão de homologação em subdiretório, se for preciso mostrar uma alteração grande antes de publicar:
+
+```bash
+npm run build:novosite
+```
+
+```bash
+npm run zip:novosite
+```
+
+O `goldline-novosite.zip` vai para `public_html/novosite/`. Essa versão tem `noindex` (meta e `X-Robots-Tag`), não tem `robots.txt` nem sitemap e marca `site_ambiente: 'homologacao'`. Depois de aprovar, apague a pasta `novosite` do servidor.

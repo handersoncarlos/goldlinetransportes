@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Transportadora aérea e rodoviária | Goldline Transportes</title>
 <meta name="description" content="Transporte aéreo e rodoviário para todo o Brasil, com bases em Fortaleza e Guarulhos. Autorizada para farma, químicos e perigosos. Solicite sua cotação.">
-<!-- TODO 3: domínio final em SITE_URL (config.js) -->
+<!-- Domínio final em SITE_URL (config.js) -->
 <link rel="canonical" href="{{SITE_URL}}/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
@@ -28,10 +28,25 @@
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "MovingCompany",
-      "name": "Goldline Transportes - Matriz Fortaleza",
-      "url": "{{SITE_URL}}",
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organizacao",
+      "name": "Goldline Transportes",
+      "legalName": "{{RAZAO_SOCIAL}}",
+      "url": "{{SITE_URL}}/",
+      "logo": "{{SITE_URL}}/logo-goldline.png",
       "image": "{{SITE_URL}}/og-image.jpg",
+      "email": "comercial@goldlinetransportes.com.br",
+      "areaServed": "BR",
+      "sameAs": ["{{INSTAGRAM_URL}}", "{{FACEBOOK_URL}}"],
+      "department": [{"@id": "{{SITE_URL}}/#matriz-fortaleza"}, {"@id": "{{SITE_URL}}/#filial-guarulhos"}]
+    },
+    {
+      "@type": "LocalBusiness",
+      "@id": "{{SITE_URL}}/#matriz-fortaleza",
+      "name": "Goldline Transportes - Matriz Fortaleza",
+      "url": "{{SITE_URL}}/",
+      "image": "{{SITE_URL}}/og-image.jpg",
+      "logo": "{{SITE_URL}}/logo-goldline.png",
       "telephone": "+55-85-3469-2888",
       "email": "comercial@goldlinetransportes.com.br",
       "address": {"@type": "PostalAddress","streetAddress": "Rua Paraguaçu, 825, Serrinha","addressLocality": "Fortaleza","addressRegion": "CE","postalCode": "60742-755","addressCountry": "BR"},
@@ -40,20 +55,23 @@
         {"@type": "OpeningHoursSpecification","dayOfWeek": "Saturday","opens": "08:00","closes": "13:00"}
       ],
       "areaServed": "BR",
-      "sameAs": ["{{INSTAGRAM_URL}}"]
+      "parentOrganization": {"@id": "{{SITE_URL}}/#organizacao"}
     },
     {
-      "@type": "MovingCompany",
+      "@type": "LocalBusiness",
+      "@id": "{{SITE_URL}}/#filial-guarulhos",
       "name": "Goldline Transportes - Filial Guarulhos",
-      "url": "{{SITE_URL}}",
+      "url": "{{SITE_URL}}/",
       "image": "{{SITE_URL}}/og-image.jpg",
+      "logo": "{{SITE_URL}}/logo-goldline.png",
       "telephone": "+55-11-2488-7888",
       "address": {"@type": "PostalAddress","streetAddress": "Av. Santa Ifigênia, 721, Vila Paraíso","addressLocality": "Guarulhos","addressRegion": "SP","postalCode": "07242-100","addressCountry": "BR"},
       "openingHoursSpecification": [
         {"@type": "OpeningHoursSpecification","dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens": "08:00","closes": "18:00"},
         {"@type": "OpeningHoursSpecification","dayOfWeek": "Saturday","opens": "08:00","closes": "13:00"}
       ],
-      "areaServed": "BR"
+      "areaServed": "BR",
+      "parentOrganization": {"@id": "{{SITE_URL}}/#organizacao"}
     }
   ]
 }
@@ -78,12 +96,14 @@
   <svg class="curve curve--2" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="49.5" pathLength="1"/></svg>
   <div class="wrap hero__in">
     <p class="eyebrow hero__eyebrow">Transportadora aérea e rodoviária</p>
-    <h1 class="hero__title" id="hero-title">Sua carga em <span class="g">todo o Brasil</span>, por ar ou por estrada</h1>
+    <h1 class="hero__title" id="hero-title">Rodoviário expresso <span class="g">do Nordeste ao Sudeste em 3 dias</span> e aéreo para <span class="g">todo o Brasil</span>.</h1>
     <p class="hero__sub">Atendemos comércio, varejo e indústria com coleta, transporte e entrega em todo o território nacional, incluindo cargas farmacêuticas, químicas e perigosas.</p>
     <div class="ctas hero__ctas">
       <a href="#cotacao" class="btn btn-gold" data-cta="hero">Solicitar cotação <svg><use href="#i-arrow"/></svg></a>
       <a href="{{wa:hero}}" class="btn btn-outline" target="_blank" rel="noopener" data-wa-origem="hero"><svg><use href="#i-wa"/></svg>Falar no WhatsApp</a>
     </div>
+    <!-- TODO 19: confirmar com o cliente a condição do prazo de 3 dias (origem, dias úteis, cidades atendidas) -->
+    <p class="hero__note">Prazo do expresso rodoviário a partir da origem e destino informados na cotação.</p>
   </div>
 </section>
 
@@ -262,8 +282,7 @@
   <div class="wrap award">
     <div class="award-photos" data-mosaic>
       <img data-defer class="award-photos__main" data-src="/img/premiacao-nova-960.webp" data-srcset="/img/premiacao-nova-480.webp 480w, /img/premiacao-nova-960.webp 960w, /img/premiacao-nova-1280.webp 1280w" data-sizes="(min-width: 1200px) 520px, (min-width: 860px) 45vw, 100vw" width="1280" height="1024" alt="Representante da Goldline recebendo homenagem em evento" loading="lazy" decoding="async"><noscript><img class="award-photos__main" src="/img/premiacao-nova-960.webp" srcset="/img/premiacao-nova-480.webp 480w, /img/premiacao-nova-960.webp 960w, /img/premiacao-nova-1280.webp 1280w" sizes="(min-width: 1200px) 520px, (min-width: 860px) 45vw, 100vw" width="1280" height="1024" alt="Representante da Goldline recebendo homenagem em evento" loading="lazy" decoding="async"></noscript>
-      <img src="/img/premio-043.webp" width="480" height="320" alt="Equipe Goldline recebendo o Prêmio Top LATAM Cargo" loading="lazy" decoding="async">
-      <img src="/img/premio-042.webp" width="384" height="480" alt="Troféu Top LATAM Cargo" loading="lazy" decoding="async">
+      <img class="award-photos__meli" src="/img/premiacao-meli-air-480.webp" srcset="/img/premiacao-meli-air-480.webp 480w, /img/premiacao-meli-air-720.webp 720w" sizes="(min-width: 1200px) 280px, (min-width: 860px) 24vw, 50vw" width="720" height="747" alt="Equipe Goldline em evento Meli Air, do Mercado Livre" loading="lazy" decoding="async">
       <img src="/img/premio-040.webp" width="288" height="384" alt="Premiação LATAM Cargo" loading="lazy" decoding="async">
       <img src="/img/premio-045.webp" width="512" height="384" alt="Representantes da Goldline na premiação" loading="lazy" decoding="async">
     </div>
@@ -277,13 +296,75 @@
       <p class="partners-label">Parceiros</p>
       <div class="partners-wrap">
         <ul class="partners">
-          <li><img src="/img/logo-latamcargo-300.webp" srcset="/img/logo-latamcargo-300.webp 300w, /img/logo-latamcargo-600.webp 600w" sizes="(min-width: 860px) 300px, 45vw" width="300" height="122" alt="LATAM Cargo" loading="lazy" decoding="async"></li>
           <li><img src="/img/logo-gollog-300.webp" srcset="/img/logo-gollog-300.webp 300w, /img/logo-gollog-600.webp 600w" sizes="(min-width: 860px) 300px, 45vw" width="300" height="122" alt="GOLLOG" loading="lazy" decoding="async"></li>
-          <li><img src="/img/logo-azulcargo-300.webp" srcset="/img/logo-azulcargo-300.webp 300w, /img/logo-azulcargo-600.webp 600w" sizes="(min-width: 860px) 300px, 45vw" width="300" height="122" alt="Azul Cargo Express" loading="lazy" decoding="async"></li>
           <li><img src="/img/logo-mercadolivre-300.webp" srcset="/img/logo-mercadolivre-300.webp 300w, /img/logo-mercadolivre-600.webp 600w" sizes="(min-width: 860px) 300px, 45vw" width="300" height="122" alt="Mercado Livre" loading="lazy" decoding="async"></li>
+          <li><img src="/img/logo-latamcargo-300.webp" srcset="/img/logo-latamcargo-300.webp 300w, /img/logo-latamcargo-600.webp 600w" sizes="(min-width: 860px) 300px, 45vw" width="300" height="122" alt="LATAM Cargo" loading="lazy" decoding="async"></li>
+          <li><img src="/img/logo-azulcargo-300.webp" srcset="/img/logo-azulcargo-300.webp 300w, /img/logo-azulcargo-600.webp 600w" sizes="(min-width: 860px) 300px, 45vw" width="300" height="122" alt="Azul Cargo Express" loading="lazy" decoding="async"></li>
         </ul>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- SAÚDE MENTAL E BEM-ESTAR (NR-1) -->
+<section id="bem-estar" class="section alt" aria-labelledby="bem-estar-title">
+  <div class="wrap">
+    <div class="nr1-head" data-r>
+      <p class="eyebrow">Pessoas e bem-estar</p>
+      <h2 id="bem-estar-title">Cuidar de quem faz a Goldline <span class="g">acontecer</span></h2>
+      <p class="lead">Ações de saúde mental e bem-estar com nossos colaboradores, em linha com a NR-1.</p>
+      <p class="nr1-head__text">Uma operação que atende todo o Brasil depende de pessoas bem cuidadas. Por isso, a Goldline promove ações de saúde mental e bem-estar com seus colaboradores, em linha com a NR-1, norma que inclui os riscos psicossociais na gestão de segurança e saúde no trabalho. Acreditamos que um ambiente saudável é também mais seguro e mais produtivo.</p>
+      <!-- TODO 20: ações realizadas (ex.: palestras, rodas de conversa, acompanhamento). A lista só deve ser renderizada com itens confirmados pelo cliente. Estrutura pronta:
+      <ul class="nr1-acoes">
+        <li><svg aria-hidden="true"><use href="#i-heart"/></svg>[ação 1]</li>
+        <li><svg aria-hidden="true"><use href="#i-check"/></svg>[ação 2]</li>
+        <li><svg aria-hidden="true"><use href="#i-shield"/></svg>[ação 3]</li>
+      </ul>
+      -->
+    </div>
+    <!-- TODO 21: alt descritivo de cada foto da galeria (provisório: "Ação de bem-estar com colaboradores da Goldline") -->
+    <ul class="nr1-gallery" data-nr1 aria-label="Galeria de ações de bem-estar">
+      <li class="nr1-gallery__item nr1-gallery__item--big">
+        <a href="/img/nr1-07-925.webp" class="nr1-gallery__link" data-lightbox="0" aria-label="Ampliar foto 1 de 8">
+          <img src="/img/nr1-07-480.webp" srcset="/img/nr1-07-480.webp 480w, /img/nr1-07-925.webp 925w" sizes="(min-width: 1200px) 580px, (min-width: 860px) 50vw, 100vw" width="925" height="900" alt="Ação de bem-estar com colaboradores da Goldline" loading="lazy" decoding="async" style="object-position:50% 30%">
+        </a>
+      </li>
+      <li class="nr1-gallery__item nr1-gallery__item--tall">
+        <a href="/img/nr1-03-960.webp" class="nr1-gallery__link" data-lightbox="1" aria-label="Ampliar foto 2 de 8">
+          <img src="/img/nr1-03-480.webp" srcset="/img/nr1-03-480.webp 480w, /img/nr1-03-960.webp 960w" sizes="(min-width: 1200px) 290px, (min-width: 860px) 25vw, 50vw" width="960" height="1280" alt="Ação de bem-estar com colaboradores da Goldline" loading="lazy" decoding="async" style="object-position:68% 40%">
+        </a>
+      </li>
+      <li class="nr1-gallery__item">
+        <a href="/img/nr1-01-1280.webp" class="nr1-gallery__link" data-lightbox="2" aria-label="Ampliar foto 3 de 8">
+          <img src="/img/nr1-01-480.webp" srcset="/img/nr1-01-480.webp 480w, /img/nr1-01-960.webp 960w" sizes="(min-width: 1200px) 290px, (min-width: 860px) 25vw, 50vw" width="1280" height="960" alt="Ação de bem-estar com colaboradores da Goldline" loading="lazy" decoding="async" style="object-position:50% 45%">
+        </a>
+      </li>
+      <li class="nr1-gallery__item">
+        <a href="/img/nr1-02-1280.webp" class="nr1-gallery__link" data-lightbox="3" aria-label="Ampliar foto 4 de 8">
+          <img src="/img/nr1-02-480.webp" srcset="/img/nr1-02-480.webp 480w, /img/nr1-02-960.webp 960w" sizes="(min-width: 1200px) 290px, (min-width: 860px) 25vw, 50vw" width="1536" height="864" alt="Ação de bem-estar com colaboradores da Goldline" loading="lazy" decoding="async" style="object-position:70% 40%">
+        </a>
+      </li>
+      <li class="nr1-gallery__item">
+        <a href="/img/nr1-04-720.webp" class="nr1-gallery__link" data-lightbox="4" aria-label="Ampliar foto 5 de 8">
+          <img src="/img/nr1-04-480.webp" srcset="/img/nr1-04-480.webp 480w, /img/nr1-04-720.webp 720w" sizes="(min-width: 1200px) 290px, (min-width: 860px) 25vw, 50vw" width="720" height="1280" alt="Ação de bem-estar com colaboradores da Goldline" loading="lazy" decoding="async" style="object-position:50% 28%">
+        </a>
+      </li>
+      <li class="nr1-gallery__item">
+        <a href="/img/nr1-05-960.webp" class="nr1-gallery__link" data-lightbox="5" aria-label="Ampliar foto 6 de 8">
+          <img src="/img/nr1-05-480.webp" srcset="/img/nr1-05-480.webp 480w, /img/nr1-05-960.webp 960w" sizes="(min-width: 1200px) 290px, (min-width: 860px) 25vw, 50vw" width="960" height="1280" alt="Ação de bem-estar com colaboradores da Goldline" loading="lazy" decoding="async" style="object-position:50% 30%">
+        </a>
+      </li>
+      <li class="nr1-gallery__item">
+        <a href="/img/nr1-06-960.webp" class="nr1-gallery__link" data-lightbox="6" aria-label="Ampliar foto 7 de 8">
+          <img src="/img/nr1-06-480.webp" srcset="/img/nr1-06-480.webp 480w, /img/nr1-06-960.webp 960w" sizes="(min-width: 1200px) 290px, (min-width: 860px) 25vw, 50vw" width="960" height="1280" alt="Ação de bem-estar com colaboradores da Goldline" loading="lazy" decoding="async" style="object-position:50% 60%">
+        </a>
+      </li>
+      <li class="nr1-gallery__item">
+        <a href="/img/nr1-08-720.webp" class="nr1-gallery__link" data-lightbox="7" aria-label="Ampliar foto 8 de 8">
+          <img src="/img/nr1-08-480.webp" srcset="/img/nr1-08-480.webp 480w, /img/nr1-08-720.webp 720w" sizes="(min-width: 1200px) 290px, (min-width: 860px) 25vw, 50vw" width="720" height="1280" alt="Ação de bem-estar com colaboradores da Goldline" loading="lazy" decoding="async" style="object-position:50% 40%">
+        </a>
+      </li>
+    </ul>
   </div>
 </section>
 

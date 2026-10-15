@@ -1,0 +1,53 @@
+# Build e publicação: a cada push na main (ou manualmente), gera dist/ e publica o conteúdo
+# na branch deploy, que a Hostinger implanta em public_html. Se o build falhar, nada é publicado.
+name: Build e deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Código
+        uses: actions/checkout@v4
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Dependências
+        run: npm ci
+
+      - name: Build (raiz do domínio)
+        run: npm run build
+
+      - name: Conferir build
+        run: |
+          test -f dist/index.html
+          test -f dist/.htaccess
+          ! grep -rq "/novosite" dist
+
+      - name: Publicar dist/ na branch deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MSG: ${{ github.event.head_commit.message }}
+        run: |
+          cd dist
+          git init -q -b deploy
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Deploy ${GITHUB_SHA::7}: $(printf '%s' "${MSG:-manual}" | head -n1)"
+          git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" deploy

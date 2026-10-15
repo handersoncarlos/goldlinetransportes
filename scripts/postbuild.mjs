@@ -55,13 +55,13 @@ const ADS = ['https://www.googleadservices.com', 'https://googleads.g.doubleclic
 
 const csp = [
   "default-src 'self'",
-  `script-src 'self' ${[...hashes].join(' ')} ${[...GA, ...META, ...ADS, 'https://formspree.io'].join(' ')}`,
-  `connect-src 'self' ${[...GA, ...META, ...ADS, 'https://www.google.com', 'https://formspree.io'].join(' ')}`,
+  `script-src 'self' ${[...hashes].join(' ')} ${[...GA, ...META, ...ADS].join(' ')}`,
+  `connect-src 'self' ${[...GA, ...META, ...ADS, 'https://www.google.com', 'https://api.web3forms.com'].join(' ')}`,
   `img-src 'self' data: ${[...GA, ...META, ...ADS, 'https://www.google.com', 'https://www.google.com.br', YOUTUBE_ID ? 'https://i.ytimg.com' : ''].filter(Boolean).join(' ')}`,
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self'",
   "frame-src https://www.google.com https://www.youtube-nocookie.com https://www.googletagmanager.com https://td.doubleclick.net",
-  "form-action 'self' https://formspree.io",
+  "form-action 'self' https://api.web3forms.com",
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'self'",
@@ -69,16 +69,16 @@ const csp = [
 ].join('; ');
 
 const tpl = await readFile('scripts/htaccess.template', 'utf8');
+const HOST = new URL(SITE_URL).host;
 const rewrite = IS_ROOT
   ? `# ---------------------------------------------------------------------------
-# HTTPS e domínio sem www (301)
+# HTTPS e domínio sem www (301): www.${HOST} -> https://${HOST}
 # ---------------------------------------------------------------------------
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteCond %{HTTPS} off [OR]
-  RewriteCond %{HTTP_HOST} ^www\\. [NC]
-  RewriteCond %{HTTP_HOST} ^(?:www\\.)?(.+)$ [NC]
-  RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301,NE]
+  RewriteCond %{HTTP_HOST} ^www\\.${HOST.replace(/\./g, '\\.')}$ [NC]
+  RewriteRule ^ https://${HOST}%{REQUEST_URI} [L,R=301,NE]
 
   # /index.html -> /
   RewriteCond %{THE_REQUEST} \\s/+index\\.html[\\s?] [NC]
@@ -107,21 +107,21 @@ await writeFile(`${DIST}/.htaccess`, tpl
 
 // robots.txt e sitemap.xml só na publicação final (robots.txt só vale na raiz do domínio)
 if (IS_ROOT) {
-  await writeFile(`${DIST}/robots.txt`, `User-agent: *
-  Allow: /
-
-  Sitemap: ${SITE_URL}/sitemap.xml
-  `);
+  await writeFile(`${DIST}/robots.txt`, [
+    'User-agent: *',
+    'Allow: /',
+    '',
+    `Sitemap: ${SITE_URL}/sitemap.xml`,
+    '',
+  ].join('\n'));
 
   const today = new Date().toISOString().slice(0, 10);
+  const urls = [['/', '1.0'], ['/trabalhe-conosco.html', '0.5'], ['/politica-de-privacidade.html', '0.3']];
   await writeFile(`${DIST}/sitemap.xml`, `<?xml version="1.0" encoding="UTF-8"?>
-  <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <url><loc>${SITE_URL}/</loc><lastmod>${today}</lastmod><priority>1.0</priority></url>
-    <url><loc>${SITE_URL}/trabalhe-conosco.html</loc><lastmod>${today}</lastmod><priority>0.5</priority></url>
-    <url><loc>${SITE_URL}/politica-de-privacidade.html</loc><lastmod>${today}</lastmod><priority>0.3</priority></url>
-  </urlset>
-  `);
-
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map(([u, p]) => `  <url><loc>${SITE_URL}${u}</loc><lastmod>${today}</lastmod><priority>${p}</priority></url>`).join('\n')}
+</urlset>
+`);
 } else {
   await rm(`${DIST}/robots.txt`, { force: true });
   await rm(`${DIST}/sitemap.xml`, { force: true });
