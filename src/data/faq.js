@@ -20,7 +20,6 @@ export const FAQ = [
   {
     q: 'Qual o prazo de entrega?',
     a: 'No expresso rodoviário, entregamos no Sudeste em 3 dias. Para os demais destinos, o prazo depende da origem, do destino e do modal. Informe esses dados no formulário e retornamos com o prazo junto com a cotação.',
-    todo: 'TODO 19: confirmar com o cliente a condição do prazo de 3 dias',
   },
   {
     q: 'O que é o serviço Próximo Voo?',

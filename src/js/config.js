@@ -31,11 +31,11 @@ export const EMAIL_RH = 'rh@goldlinetransportes.com.br';
 // TODO 6: ID do vídeo institucional no YouTube (ex.: 'dQw4w9WgXcQ'). Vazio = bloco de vídeo não aparece.
 export const YOUTUBE_ID = '';
 
-// TODO 2: confirmar razão social e CNPJ
+// Razão social e CNPJ (rodapé, política e JSON-LD)
 export const RAZAO_SOCIAL = 'Gold Line Transporte de Cargas Aéreas LTDA';
 export const CNPJ = '05.290.498/0001-98';
 
-// TODO 1: validar com o cliente. Valores da versão 1.
+// Números da faixa dourada
 export const STATS = [
   { prefix: '+', value: 20, decimals: 0, suffix: '', label: 'Anos de mercado' },
   { prefix: '+', value: 2000, decimals: 0, suffix: '', label: 'Clientes atendidos' },

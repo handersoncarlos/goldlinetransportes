@@ -87,8 +87,8 @@ Tudo que o cliente ainda vai confirmar está em **`src/js/config.js`**:
 | `FACEBOOK_URL`, `INSTAGRAM_URL` | Redes sociais (rodapé e JSON-LD) | Ícone não aparece |
 | `EMAIL_RH` | E-mail do RH na página Trabalhe Conosco | |
 | `YOUTUBE_ID` | ID do vídeo institucional (TODO 6) | Bloco de vídeo não aparece na seção Sobre |
-| `RAZAO_SOCIAL`, `CNPJ` | Dados do rodapé e da política (TODO 2) | |
-| `STATS` | Números da faixa dourada (TODO 1) | |
+| `RAZAO_SOCIAL`, `CNPJ` | Dados do rodapé, da política e do JSON-LD | |
+| `STATS` | Números da faixa dourada | |
 | `WA` | Números e mensagens de cada botão de WhatsApp | |
 
 Depois de editar, revise no localhost (seção 6) e envie para a `main`.
