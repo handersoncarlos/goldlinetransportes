@@ -14,8 +14,10 @@ export const GTM_ID = '';
 export const WEB3FORMS_ACCESS_KEY = 'a2a8b2a4-dc13-492e-8739-44ce4af627c7';
 export const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
 
-export const WHATSAPP_COMERCIAL = '5585997010005';
-export const WHATSAPP_GUARULHOS = '5511910601099';
+// WhatsApp principal (Matriz Fortaleza e Filial Guarulhos usam o mesmo número)
+export const WHATSAPP_COMERCIAL = '5585986873887';
+// Como o número aparece escrito no site
+export const WHATSAPP_EXIBICAO = '(85) 98687-3887';
 
 // Área do Cliente (sistema de rastreamento). Vazio = link e botão não aparecem.
 export const AREA_CLIENTE_URL = 'https://goldline.brudam.com.br/site/';
@@ -50,7 +52,7 @@ export const WA = {
   'card-rodoviario': { numero: WHATSAPP_COMERCIAL, msg: 'Olá! Vim pelo site e quero cotar frete rodoviário.' },
   'card-farma': { numero: WHATSAPP_COMERCIAL, msg: 'Olá! Vim pelo site e quero cotar transporte de carga especial (farma, química ou perigosa).' },
   'unidade-fortaleza': { numero: WHATSAPP_COMERCIAL, msg: 'Olá! Vim pelo site e quero falar com a unidade de Fortaleza.' },
-  'unidade-guarulhos': { numero: WHATSAPP_GUARULHOS, msg: 'Olá! Vim pelo site e quero falar com a unidade de Guarulhos.' },
+  'unidade-guarulhos': { numero: WHATSAPP_COMERCIAL, msg: 'Olá! Vim pelo site e quero falar com a unidade de Guarulhos.' },
   flutuante: { numero: WHATSAPP_COMERCIAL, msg: 'Olá! Vim pelo site da Goldline e quero atendimento.' },
   'cta-final': { numero: WHATSAPP_COMERCIAL, msg: 'Olá! Vim pelo site e quero uma proposta para minha operação.' },
 };
