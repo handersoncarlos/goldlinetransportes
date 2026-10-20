@@ -37,11 +37,12 @@ export const YOUTUBE_ID = '';
 export const RAZAO_SOCIAL = 'Gold Line Transporte de Cargas Aéreas LTDA';
 export const CNPJ = '05.290.498/0001-98';
 
-// Ano de fundação. Os anos de mercado são calculados a partir dele (selo do Sobre, faixa de números e JSON-LD).
+// Fundação: outubro de 2015. Os anos de mercado são calculados a partir daqui (selo do Sobre, faixa de números
+// e JSON-LD). O número só sobe no mês do aniversário. Roda no build (HTML sem JS) e de novo no navegador.
 export const ANO_FUNDACAO = 2015;
-// Anos completos garantidos: ano atual - fundação - 1 (o mês de fundação não é conhecido, então o número
-// nunca passa do tempo real). Roda no build (HTML sem JS) e de novo no navegador (contador).
-export const anosDeMercado = (anoAtual = new Date().getFullYear()) => anoAtual - ANO_FUNDACAO - 1;
+export const MES_FUNDACAO = 10; // outubro
+export const anosDeMercado = (hoje = new Date()) =>
+  hoje.getFullYear() - ANO_FUNDACAO - (hoje.getMonth() + 1 < MES_FUNDACAO ? 1 : 0);
 
 // Números da faixa dourada
 export const STATS = [

@@ -88,7 +88,7 @@ Tudo que o cliente ainda vai confirmar está em **`src/js/config.js`**:
 | `EMAIL_RH` | E-mail do RH na página Trabalhe Conosco | |
 | `YOUTUBE_ID` | ID do vídeo institucional (TODO 6) | Bloco de vídeo não aparece na seção Sobre |
 | `RAZAO_SOCIAL`, `CNPJ` | Dados do rodapé, da política e do JSON-LD | |
-| `ANO_FUNDACAO` | Ano de fundação (2015). Gera o selo "Desde 2015 em Fortaleza", o `foundingDate` do JSON-LD e os anos de mercado da faixa dourada: ano atual - fundação - 1 (nunca passa do tempo real). O número é recalculado no navegador; o HTML sem JavaScript usa o valor do ano em que o build foi feito | |
+| `ANO_FUNDACAO`, `MES_FUNDACAO` | Fundação em outubro de 2015. Geram o selo "Desde 2015 em Fortaleza", o `foundingDate` do JSON-LD e os anos de mercado da faixa dourada, que sobem a cada outubro (em outubro de 2026: +11). O número é recalculado no navegador; o HTML sem JavaScript usa o valor da data em que o build foi feito | |
 | `STATS` | Demais números da faixa dourada | |
 | `WA` | Números e mensagens de cada botão de WhatsApp | |
 
