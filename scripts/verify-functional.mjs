@@ -2,7 +2,7 @@
 // Uso: node scripts/verify-functional.mjs <url do build normal> <url do build de teste com GTM_ID>
 // O Web3Forms é SEMPRE interceptado (nenhum envio real): sem rota própria, a resposta simulada é de erro.
 import { chromium } from 'playwright-core';
-import { WA } from '../src/js/config.js';
+import { WA, anosDeMercado } from '../src/js/config.js';
 
 const [BASE = 'http://localhost:4173/', TEST = 'http://localhost:4174/'] = process.argv.slice(2);
 // Homologação (subdiretório): páginas com noindex, sem robots.txt e sitemap
@@ -274,7 +274,7 @@ const VALID = { nome: 'Teste Silva', empresa: 'Empresa Teste', telefone: '859999
   check('Movimento reduzido: bundle de animação não é baixado', scripts.length === 0);
   check('Movimento reduzido: sem Lenis e sem marquee', await page.evaluate(() => !document.documentElement.classList.contains('lenis') && !document.querySelector('.clients.is-marquee')));
   const stat = await page.textContent('.stat .count');
-  check('Movimento reduzido: números no valor final', stat === '20', stat);
+  check('Movimento reduzido: números no valor final (anos de mercado calculados)', stat === String(anosDeMercado()), stat);
   await ctx.close();
 }
 

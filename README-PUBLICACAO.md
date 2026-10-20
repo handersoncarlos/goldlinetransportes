@@ -88,7 +88,8 @@ Tudo que o cliente ainda vai confirmar está em **`src/js/config.js`**:
 | `EMAIL_RH` | E-mail do RH na página Trabalhe Conosco | |
 | `YOUTUBE_ID` | ID do vídeo institucional (TODO 6) | Bloco de vídeo não aparece na seção Sobre |
 | `RAZAO_SOCIAL`, `CNPJ` | Dados do rodapé, da política e do JSON-LD | |
-| `STATS` | Números da faixa dourada | |
+| `ANO_FUNDACAO` | Ano de fundação (2015). Gera o selo "Desde 2015 em Fortaleza", o `foundingDate` do JSON-LD e os anos de mercado da faixa dourada: ano atual - fundação - 1 (nunca passa do tempo real). O número é recalculado no navegador; o HTML sem JavaScript usa o valor do ano em que o build foi feito | |
+| `STATS` | Demais números da faixa dourada | |
 | `WA` | Números e mensagens de cada botão de WhatsApp | |
 
 Depois de editar, revise no localhost (seção 6) e envie para a `main`.
@@ -176,7 +177,7 @@ npm run verify:shots -- --sections
 npm run verify:func
 ```
 
-`verify:shots` gera capturas em `_verificacao/` (360 a 1920 px; use `--reduced` para movimento reduzido e `--nojs` para JavaScript desativado). `verify:func` testa formulário, WhatsApp, eventos, consentimento, menu, FAQ, galeria e SEO. As requisições ao Web3Forms são sempre interceptadas nos testes (nenhum envio real). Para o teste do GTM, ele espera em `http://localhost:4174` um build com um `GTM_ID` de teste.
+`verify:shots` gera capturas em `_verificacao/` (360 a 1920 px; use `--reduced` para movimento reduzido e `--nojs` para JavaScript desativado). `verify:func` testa formulário, WhatsApp, eventos, consentimento, menu, FAQ, galeria e SEO. As requisições ao Web3Forms são sempre interceptadas nos testes (nenhum envio real). Para o teste do GTM, ele espera em `http://localhost:4174` um build com um `GTM_ID` de teste, gerado por `scripts/build-test.sh` em `dist-test/` (o `config.js` é restaurado no fim) e servido com `OUT_DIR=dist-test PORT=4174 node scripts/serve.mjs`.
 
 Os testes usam o Google Chrome instalado em `/Applications`.
 

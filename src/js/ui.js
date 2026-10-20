@@ -270,3 +270,12 @@ export function initLightbox(onOpen) {
     x0 = y0 = null;
   });
 }
+
+// Anos de mercado calculados no navegador a partir de ANO_FUNDACAO (o HTML já sai com o valor do ano do build;
+// aqui ele se mantém certo nos anos seguintes, antes do contador animado ler o data-to)
+export function initAnosDeMercado(anos) {
+  document.querySelectorAll('.count[data-anos]').forEach((el) => {
+    el.dataset.to = String(anos);
+    el.textContent = anos.toLocaleString('pt-BR') + (el.dataset.suffix || '');
+  });
+}

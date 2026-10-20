@@ -1,12 +1,14 @@
 import '../css/main.css';
 import { initConsent } from './consent.js';
 import { initForm } from './form.js';
-import { initHeader, initMenu, initFaq, initClients, initLazyMaps, initVideo, initWaFloat, initToTop, initCopy, initYear, initDeferredImages, initLightbox } from './ui.js';
+import { initHeader, initMenu, initFaq, initClients, initLazyMaps, initVideo, initWaFloat, initToTop, initCopy, initYear, initDeferredImages, initLightbox, initAnosDeMercado } from './ui.js';
+import { anosDeMercado } from './config.js';
 import { captureUtm, initClickTracking, track } from './tracking.js';
 
 const root = document.documentElement;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+initAnosDeMercado(anosDeMercado());
 captureUtm();
 initConsent();
 const prefill = initForm();

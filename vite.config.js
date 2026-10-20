@@ -14,7 +14,7 @@ const fmt = (n, dec) => n.toLocaleString('pt-BR', { minimumFractionDigits: dec, 
 
 function renderStats() {
   return cfg.STATS.map(
-    (s) => `<div class="stat"><p class="stat__num">${esc(s.prefix)}<span class="count" data-to="${s.value}" data-dec="${s.decimals}" data-suffix="${esc(s.suffix)}">${fmt(s.value, s.decimals)}${esc(s.suffix)}</span></p><p class="stat__label">${esc(s.label)}</p><span class="stat__div" aria-hidden="true"></span></div>`
+    (s) => `<div class="stat"><p class="stat__num">${esc(s.prefix)}<span class="count"${s.anos ? ' data-anos' : ''} data-to="${s.value}" data-dec="${s.decimals}" data-suffix="${esc(s.suffix)}">${fmt(s.value, s.decimals)}${esc(s.suffix)}</span></p><p class="stat__label">${esc(s.label)}</p><span class="stat__div" aria-hidden="true"></span></div>`
   ).join('\n      ');
 }
 
@@ -91,6 +91,7 @@ function template() {
           HOME: isHome ? '' : BASE,
           BASE,
           SITE_AMBIENTE: AMBIENTE,
+          ANO_FUNDACAO: String(cfg.ANO_FUNDACAO),
           YEAR: String(new Date().getFullYear()),
           STATS: renderStats(),
           FAQ: renderFaq(),
