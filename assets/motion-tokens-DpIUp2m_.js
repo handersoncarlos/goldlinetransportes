@@ -1,0 +1,1 @@
+var e={dur:.7,durShort:.4,durLong:.9,ease:`power3.out`,easeReveal:`expo.out`,stagger:.08,staggerTight:.06,dist:typeof matchMedia==`function`&&matchMedia(`(max-width: 767px)`).matches?20:32};export{e as t};

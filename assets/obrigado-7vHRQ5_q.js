@@ -1,0 +1,1 @@
+import{C as e,S as t,b as n,g as r,l as i,o as a,p as o,u as s}from"./ui-DRwURARv.js";e(),r(),a(),i(),s(),o();try{let e=JSON.parse(sessionStorage.getItem(`gl_cotacao`)),r=document.getElementById(`thanksWa`);e?.msg&&r&&(r.href=t(n,e.msg))}catch{}document.documentElement.classList.remove(`mo`);
